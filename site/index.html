@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoneyPrinterCannon — тема на входе, готовый ролик на выходе</title>
+<meta name="description" content="Open-source генератор коротких видео: ИИ-сценарий, живой голос, ИИ-визуал или бесплатные стоки, музыка, караоке-субтитры по словам. Один ключ Genosai. Бесплатная публикация в YouTube, TikTok, Instagram, LinkedIn. Круче MoneyPrinterTurbo.">
+<link rel="canonical" href="https://moneyprintercannon.bogatushin.ru/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MoneyPrinterCannon — MoneyPrinterTurbo был принтером. Это пушка.">
+<meta property="og:description" content="Тема → готовый ролик за 3 минуты: сценарий, голос, ИИ-визуал, музыка, караоке-субтитры. Open source, один ключ Genosai, бесплатная публикация.">
+<meta property="og:image" content="https://moneyprintercannon.bogatushin.ru/assets/poster-wide.jpg">
+<meta property="og:url" content="https://moneyprintercannon.bogatushin.ru/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310b981'/%3E%3Ctext x='32' y='44' font-size='36' text-anchor='middle' font-family='Arial' font-weight='700' fill='%23062b1f'%3E$%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b09;--bg2:#0b100e;--surface:#0f1512;--surface2:#131b17;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);--fg:#eef3f0;--muted:#9aa89f;--dim:#6f7d75;--green:#10b981;--green2:#34d399;--green-soft:#a7f3d0;--amber:#fbbf24;--red:#f87171;--r:18px;--r2:28px;--shadow:0 30px 80px -30px rgba(0,0,0,.8);--glow:0 20px 60px -20px rgba(16,185,129,.5)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 Manrope,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}img,video{max-width:100%;display:block}
+.container{width:min(1160px,calc(100% - 40px));margin:0 auto}
+h1,h2,h3{font-family:Unbounded,Manrope,sans-serif;letter-spacing:-.02em;margin:0}
+h1{font-size:clamp(34px,6vw,66px);line-height:1.02;font-weight:700}
+h2{font-size:clamp(26px,3.6vw,42px);line-height:1.1;font-weight:600}
+h3{font-size:18px;font-weight:600;line-height:1.3}
+.accent{color:var(--green2)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:600 12px/1 Manrope;letter-spacing:.14em;text-transform:uppercase;color:var(--green2);margin-bottom:14px}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+.lead{font-size:clamp(16px,1.6vw,20px);color:var(--muted);max-width:720px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:999px;font-weight:700;border:1px solid var(--line2);background:var(--surface);transition:.2s;white-space:nowrap}
+.btn:hover{border-color:var(--green);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--green),#0ea371);color:#04130d;border-color:transparent;box-shadow:var(--glow)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn svg{width:18px;height:18px}
+code,pre{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+pre{margin:0;background:#060a08;border:1px solid var(--line);border-radius:14px;padding:18px 20px;overflow:auto;font-size:13.5px;line-height:1.65;color:#d8e2dc}
+pre .c{color:var(--dim)}pre .k{color:var(--green2)}pre .s{color:var(--amber)}
+.grid{display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:.25s}
+.card:hover{border-color:rgba(16,185,129,.5);transform:translateY(-2px)}
+.card p{margin:8px 0 0;color:var(--muted);font-size:15px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,.14);color:var(--green-soft)}
+section{padding:clamp(56px,8vw,110px) 0;position:relative}
+.section-head{max-width:760px;margin-bottom:40px}
+/* header */
+header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(7,11,9,.72);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font:700 17px Unbounded}
+.logo i{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--green),#0ea371);display:grid;place-items:center;font:700 18px Manrope;color:#04130d;font-style:normal}
+nav{display:flex;gap:22px;font-weight:600;color:var(--muted);font-size:14px}
+nav a:hover{color:var(--fg)}
+@media (max-width:820px){nav{display:none}}
+/* hero */
+.hero{padding:clamp(60px,10vw,120px) 0 40px;position:relative}
+.hero::before{content:"";position:absolute;inset:-200px 0 auto 0;height:640px;background:radial-gradient(60% 60% at 50% 0%,rgba(16,185,129,.22),transparent 70%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.hero .meta{display:flex;gap:22px;flex-wrap:wrap;margin-top:26px;color:var(--dim);font-size:14px}
+.hero .meta b{color:var(--fg);font-weight:700}
+.phone{position:relative;margin:0 auto;width:min(300px,80%);aspect-ratio:9/16;border-radius:38px;background:#000;border:6px solid #1a221e;box-shadow:var(--shadow),0 0 0 1px rgba(255,255,255,.05);overflow:hidden}
+.phone video{width:100%;height:100%;object-fit:cover}
+.phone .tag{position:absolute;left:14px;top:14px;z-index:2;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700}
+/* pipeline */
+.steps{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.step{counter-increment:s;position:relative}
+.step .n{font:700 13px "JetBrains Mono";color:var(--green2);margin-bottom:10px;letter-spacing:.08em}
+/* compare */
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:14.5px}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+th,td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);background:var(--surface2)}
+td:first-child{font-weight:700;white-space:nowrap}
+td.us{color:var(--green-soft)}td.them{color:var(--muted)}
+td.us::before{content:"✓ ";color:var(--green)}td.them::before{content:"✗ ";color:var(--red)}
+/* features */
+.feat{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.feat .ic{width:40px;height:40px;border-radius:12px;background:rgba(16,185,129,.12);display:grid;place-items:center;margin-bottom:14px;font-size:20px}
+/* demo wide */
+.wide{border-radius:var(--r2);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:#000}
+.wide video{width:100%;aspect-ratio:16/9}
+/* quickstart */
+.qs{grid-template-columns:1.1fr .9fr;gap:28px;align-items:start}
+@media (max-width:900px){.qs{grid-template-columns:1fr}}
+.qs ol{margin:0;padding-left:20px;color:var(--muted)}
+.qs li{margin:10px 0}.qs li b{color:var(--fg)}
+/* cta */
+.cta{background:linear-gradient(135deg,rgba(16,185,129,.16),rgba(16,185,129,.03));border:1px solid rgba(16,185,129,.35);border-radius:var(--r2);padding:clamp(30px,5vw,56px);text-align:center}
+.cta .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+footer{padding:40px 0 60px;color:var(--dim);font-size:14px;border-top:1px solid var(--line)}
+footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a:hover{color:var(--fg)}
+.kbd{font:600 12px "JetBrains Mono";background:var(--surface2);border:1px solid var(--line2);border-radius:6px;padding:2px 7px}
+.reveal{opacity:0;transform:translateY(14px);transition:.6s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<header><div class="container bar">
+  <a class="logo" href="#"><i>$</i>MoneyPrinterCannon</a>
+  <nav><a href="#how">Как работает</a><a href="#vs">vs MoneyPrinterTurbo</a><a href="#features">Возможности</a><a href="#start">Запуск</a><a href="#publish">Публикация</a></nav>
+  <a class="btn" href="https://github.com/upsalesvideo/MoneyPrinterCannon" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>GitHub</a>
+</div></header>
+
+<section class="hero"><div class="container hero-grid">
+  <div>
+    <p class="eyebrow reveal">Open source · MIT · один ключ Genosai</p>
+    <h1 class="reveal" style="transition-delay:.05s">Тема на входе. <span class="accent">Готовый ролик</span> на выходе.</h1>
+    <p class="lead reveal" style="transition-delay:.1s;margin-top:20px">Пишешь одну строку — получаешь короткое видео для Reels, Shorts и TikTok: ИИ-сценарий, живой голос, ИИ-визуал или бесплатные стоки, музыка под настроение и <b>караоке-субтитры по словам</b>. За три минуты и ≈ 50 кредитов.</p>
+    <p class="lead reveal" style="transition-delay:.15s;margin-top:14px;font-style:italic;color:var(--green-soft)">MoneyPrinterTurbo был принтером. Это — пушка.</p>
+    <div class="actions reveal" style="transition-delay:.2s">
+      <a class="btn primary" href="https://github.com/upsalesvideo/MoneyPrinterCannon" target="_blank" rel="noopener">Забрать на GitHub →</a>
+      <a class="btn" href="#how">Как это работает</a>
+    </div>
+    <div class="meta reveal" style="transition-delay:.25s"><span><b>3 мин 34 с</b> на ролик</span><span><b>46 кредитов</b> ≈ 25 ₽</span><span><b>9:16 · 16:9 · 1:1</b></span><span><b>Бесплатный</b> постинг</span></div>
+  </div>
+  <div class="reveal" style="transition-delay:.2s">
+    <div class="phone"><span class="tag">● сгенерировано за 3:34</span><video src="assets/demo-vertical.mp4" poster="assets/poster-vertical.jpg" playsinline muted loop autoplay controls preload="metadata"></video></div>
+  </div>
+</div></section>
+
+<section id="how"><div class="container">
+  <div class="section-head"><p class="eyebrow reveal">Конвейер</p><h2 class="reveal">Семь стадий — <span class="accent">одна команда</span></h2><p class="lead reveal">Каждая стадия сохраняет результат. Упало на рендере — продолжишь с рендера, за голос и картинки второй раз не платишь.</p></div>
+  <div class="grid steps">
+    <div class="card step reveal"><div class="n">01 · СЦЕНАРИЙ</div><h3>Хук в первые три секунды</h3><p>LLM пишет сценарий по сценам: у каждой — свой текст, свой визуальный промпт и поисковые слова для стоков. Длина откалибрована по реальной скорости голоса.</p></div>
+    <div class="card step reveal" style="transition-delay:.05s"><div class="n">02 · ГОЛОС</div><h3>30 голосов, стиль и темп</h3><p>Gemini TTS: Promo/Hype, Newscaster, Whisper… Один запрос на сцену — границы сцен точные и бесплатные.</p></div>
+    <div class="card step reveal" style="transition-delay:.1s"><div class="n">03 · ТАЙМИНГ</div><h3>Whisper по словам</h3><p>Пословные таймкоды, выровненные на текст сценария. Субтитры не «плывут».</p></div>
+    <div class="card step reveal" style="transition-delay:.15s"><div class="n">04 · ВИЗУАЛ</div><h3>На каждую сцену</h3><p>ИИ-картинки с эффектом Кена Бёрнса, ИИ-видео (Seedance, Veo, Kling, Grok) или бесплатные стоки Pexels/Pixabay с автофолбэком.</p></div>
+    <div class="card step reveal" style="transition-delay:.2s"><div class="n">05 · МУЗЫКА</div><h3>Трек под настроение</h3><p>Suno генерирует инструментал под сценарий; под голосом музыка приглушается сайдчейном.</p></div>
+    <div class="card step reveal" style="transition-delay:.25s"><div class="n">06 · РЕНДЕР</div><h3>Remotion в один проход</h3><p>Караоке-субтитры (4 пресета), переходы, титул, финальная плашка, прогресс-бар. Громкость −14 LUFS.</p></div>
+    <div class="card step reveal" style="transition-delay:.3s"><div class="n">07 · ПУБЛИКАЦИЯ</div><h3>YouTube · TikTok · Instagram · LinkedIn</h3><p>Бесплатно через Composio: заголовок, описание и хэштеги уже готовы.</p></div>
+  </div>
+</div></section>
+
+<section id="demo" style="padding-top:0"><div class="container">
+  <div class="wide reveal"><video src="assets/demo-wide.mp4" poster="assets/poster-wide.jpg" controls playsinline preload="metadata"></video></div>
+  <p class="reveal" style="color:var(--dim);font-size:14px;margin-top:12px">16:9, английский, ИИ-видео grok-imagine-1.5, пресет субтитров bold — сгенерировано одной командой, 5 минут, 196 кредитов.</p>
+</div></section>
+
+<section id="vs"><div class="container">
+  <div class="section-head"><p class="eyebrow reveal">Честное сравнение</p><h2 class="reveal">Чем это лучше <span class="accent">MoneyPrinterTurbo</span></h2><p class="lead reveal">У MoneyPrinterTurbo 123 000 звёзд и заслуженная слава. Но он сделан в 2024-м. Каждый пункт ниже проверяется по коду — <a href="https://github.com/upsalesvideo/MoneyPrinterCannon/blob/main/docs/VS-MONEYPRINTERTURBO-ru.md" target="_blank" rel="noopener" style="color:var(--green2)">подробный разбор со ссылками на файлы</a>.</p></div>
+  <div class="tblwrap reveal"><table>
+    <thead><tr><th></th><th>MoneyPrinterTurbo</th><th>MoneyPrinterCannon</th></tr></thead>
+    <tbody>
+      <tr><td>Субтитры</td><td class="them">статичная фраза через MoviePy</td><td class="us">караоке по словам, spring-анимация, 4 пресета</td></tr>
+      <tr><td>Визуал</td><td class="them">5 ключевых слов на весь ролик</td><td class="us">промпт и поисковые слова на каждую сцену</td></tr>
+      <tr><td>Тайминг</td><td class="them">пропорционально длине строки; при сбое субтитров нет</td><td class="us">Whisper по словам + выравнивание на сценарий</td></tr>
+      <tr><td>Голос</td><td class="them">Edge TTS, 10 провайдеров руками</td><td class="us">Gemini TTS: 30 голосов, стиль, темп, ноль настройки</td></tr>
+      <tr><td>Музыка</td><td class="them">вшитые MP3 «с YouTube»</td><td class="us">Suno под ролик, сайдчейн, −14 LUFS</td></tr>
+      <tr><td>Рендер</td><td class="them">MoviePy, три перекодирования</td><td class="us">Remotion, один проход, 56 с видео за 41 с</td></tr>
+      <tr><td>Ключи</td><td class="them">LLM + TTS + стоки + музыка + видео = 4–6 аккаунтов</td><td class="us">один ключ Genosai</td></tr>
+      <tr><td>Стоимость</td><td class="them">не видна</td><td class="us">смета до, реальный расход после (47,5 → 46,2)</td></tr>
+      <tr><td>Сбой</td><td class="them">заново и за деньги</td><td class="us">resume с упавшей стадии, без повторной оплаты</td></tr>
+      <tr><td>Публикация</td><td class="them">платный посредник upload-post.com</td><td class="us">бесплатно через Composio</td></tr>
+    </tbody>
+  </table></div>
+  <p class="reveal" style="color:var(--dim);font-size:14px;margin-top:14px">Где MPT честно впереди: путь «за 0 ₽» (Edge TTS + Pexels + Ollama), Windows без Node.js, 25 LLM-шлюзов, годы комьюнити.</p>
+</div></section>
+
+<section id="features" style="padding-top:0"><div class="container">
+  <div class="section-head"><p class="eyebrow reveal">Возможности</p><h2 class="reveal">Всё, что нужно <span class="accent">фабрике роликов</span></h2></div>
+  <div class="grid feat">
+    <div class="card reveal"><div class="ic">🖥️</div><h3>Веб-интерфейс</h3><p>Форма, живая смета в кредитах, список задач, прогресс по стадиям, плеер, кнопки «скопировать» заголовок и хэштеги.</p></div>
+    <div class="card reveal" style="transition-delay:.05s"><div class="ic">⌨️</div><h3>CLI и батчи</h3><p><code>cannon make "тема"</code>, <code>cannon batch tasks.jsonl --parallel 2</code> — до 100 роликов за прогон, resume любой задачи.</p></div>
+    <div class="card reveal" style="transition-delay:.1s"><div class="ic">🔌</div><h3>REST API + Swagger</h3><p>Дёргай из n8n, Make или своего бэкенда: <code>POST /api/tasks</code> → готовый MP4, обложка, тексты.</p></div>
+    <div class="card reveal" style="transition-delay:.15s"><div class="ic">🤖</div><h3>Скилл для ИИ-агентов</h3><p>Claude Code или Cursor ставит и запускает всё сам по одной ссылке на SKILL.md и возвращает путь к файлу.</p></div>
+    <div class="card reveal" style="transition-delay:.2s"><div class="ic">🐳</div><h3>Docker</h3><p>Один <code>docker compose up</code> — Python, Node, ffmpeg и Chromium для Remotion уже внутри.</p></div>
+    <div class="card reveal" style="transition-delay:.25s"><div class="ic">🎬</div><h3>Три формата</h3><p>9:16 для Reels/Shorts, 16:9 для YouTube, 1:1 для ленты — из одного сценария, с теми же субтитрами.</p></div>
+  </div>
+</div></section>
+
+<section id="start"><div class="container">
+  <div class="section-head"><p class="eyebrow reveal">Запуск</p><h2 class="reveal">Пять команд до <span class="accent">первого ролика</span></h2></div>
+  <div class="grid qs">
+    <pre class="reveal"><span class="c"># Python ≥ 3.11, Node ≥ 20, ffmpeg</span>
+git clone https://github.com/upsalesvideo/MoneyPrinterCannon
+cd MoneyPrinterCannon
+uv venv &amp;&amp; uv pip install -e <span class="s">".[mlx,publish]"</span>
+(cd remotion &amp;&amp; npm install)
+cp .env.example .env            <span class="c"># GENOSAI_API_KEY=...</span>
+
+<span class="k">cannon</span> doctor                  <span class="c"># ключ, ffmpeg, node, whisper</span>
+<span class="k">cannon</span> make <span class="s">"Почему коты спят шестнадцать часов"</span> --aspect 9:16
+<span class="k">cannon</span> serve                   <span class="c"># веб-интерфейс + API</span></pre>
+    <ol class="reveal">
+      <li><b>Ключ Genosai</b> — на <a href="https://genosai.io" target="_blank" rel="noopener" style="color:var(--green2)">genosai.io</a> в разделе API. Без VPN и зарубежных карт.</li>
+      <li><b>Смета до траты.</b> <code>cannon estimate "тема"</code> покажет кредиты по стадиям; <code>make</code> спросит подтверждение.</li>
+      <li><b>Ролик 45 секунд</b> на ИИ-картинках стоит ≈ 40–60 кредитов, на ИИ-видео ≈ 200–300.</li>
+      <li><b>Стоки бесплатно</b> — добавь ключи Pexels/Pixabay и включи <code>--visuals stock</code> или <code>mixed</code>.</li>
+      <li><b>Свой сценарий?</b> <code>--script-file text.txt</code> — слова не тронем, только разложим по сценам и подберём визуал.</li>
+    </ol>
+  </div>
+</div></section>
+
+<section id="publish" style="padding-top:0"><div class="container">
+  <div class="section-head"><p class="eyebrow reveal">Публикация</p><h2 class="reveal">Выложить — <span class="accent">бесплатно</span></h2><p class="lead reveal">MoneyPrinterTurbo постит через платный upload-post.com. Здесь — Composio: управляемый OAuth для YouTube, Instagram, TikTok и LinkedIn, 100 000 вызовов в месяц бесплатно, свои OAuth-приложения регистрировать не нужно.</p></div>
+  <pre class="reveal">COMPOSIO_API_KEY=ak_...            <span class="c"># бесплатный ключ platform.composio.dev</span>
+<span class="k">cannon</span> connect youtube            <span class="c"># одна ссылка, один раз</span>
+<span class="k">cannon</span> publish &lt;task_id&gt; --to youtube,tiktok --privacy public
+<span class="k">cannon</span> make <span class="s">"Тема"</span> --publish youtube --privacy unlisted   <span class="c"># сгенерил и выложил</span></pre>
+</div></section>
+
+<section><div class="container">
+  <div class="cta reveal">
+    <p class="eyebrow" style="justify-content:center">MIT · форкай, встраивай, продавай</p>
+    <h2>Собери свою <span class="accent">фабрику коротких видео</span> сегодня</h2>
+    <p class="lead" style="margin:16px auto 0">Код открыт. Нужно внедрить под ваш бренд, каталог или контент-план — напишите, сделаем.</p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/upsalesvideo/MoneyPrinterCannon" target="_blank" rel="noopener">GitHub → MoneyPrinterCannon</a>
+      <a class="btn" href="https://t.me/bogatushin" target="_blank" rel="noopener">Написать Антону в Telegram</a>
+      <a class="btn" href="https://genosai.io" target="_blank" rel="noopener">Получить ключ Genosai</a>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="container row">
+  <div>© 2026 <a href="https://bogatushin.ru/bg/">Антон Богатушин</a> · агентство «Социальный Кот» · работает на <a href="https://genosai.io">Genosai</a></div>
+  <div><a href="https://github.com/upsalesvideo/MoneyPrinterCannon">GitHub</a> · <a href="https://github.com/upsalesvideo/MoneyPrinterCannon/blob/main/README-ru.md">Документация</a> · <a href="https://github.com/upsalesvideo/MoneyPrinterCannon/blob/main/skill/SKILL.md">Скилл для агентов</a></div>
+</div></footer>
+
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
