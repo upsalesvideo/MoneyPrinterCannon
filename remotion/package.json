@@ -1,8 +1,8 @@
 {
-  "name": "cashcannon-remotion",
+  "name": "moneyprintercannon-remotion",
   "version": "1.0.0",
   "private": true,
-  "description": "CashCannon Remotion renderer: scenes + Ken Burns + karaoke captions from props.json",
+  "description": "MoneyPrinterCannon Remotion renderer: scenes + Ken Burns + karaoke captions from props.json",
   "type": "commonjs",
   "scripts": {
     "render": "remotion render src/index.ts Main out/demo.mp4 --props=public/demo/props.json --codec=h264 --crf=18 --muted --log=error",

@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from cashcannon.llm import _build_script, detect_language, parse_json_object, split_into_scenes, split_sentences
-from cashcannon.schema import VideoParams
+from moneyprintercannon.llm import _build_script, detect_language, parse_json_object, split_into_scenes, split_sentences
+from moneyprintercannon.schema import VideoParams
 
 GOOD = {"language": "en", "title": "Cats sleep a lot", "scenes": [
     {"index": 1, "narration": "Cats sleep sixteen hours a day.", "visual_prompt": "A cat asleep on a windowsill", "search_terms": ["sleeping cat", "cat", "window"], "motion": "slow push-in"},

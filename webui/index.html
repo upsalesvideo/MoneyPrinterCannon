@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MoneyPrinter CashCannon</title>
+<title>MoneyPrinterCannon</title>
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310b981'/%3E%3Ctext x='32' y='43' font-size='34' text-anchor='middle' font-family='system-ui' font-weight='800' fill='%230b0f0e'%3E%24%3C/text%3E%3C/svg%3E">
 <style>
@@ -225,7 +225,7 @@ kbd{font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(
   <div class="brand">
     <div class="logo">$</div>
     <div style="min-width:0">
-      <b>MoneyPrinter CashCannon</b>
+      <b>MoneyPrinterCannon</b>
       <div class="tag">Topic in. Money-making video out.</div>
     </div>
   </div>
@@ -448,7 +448,7 @@ kbd{font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(
             <div class="field"><label for="outro_sub">End card second line</label><input type="text" id="outro_sub" name="outro_sub" data-type="str" placeholder="@yourhandle"></div>
           </div>
           <div class="row">
-            <div class="field"><label for="watermark">Watermark text</label><input type="text" id="watermark" name="watermark" data-type="str" placeholder="made with CashCannon"></div>
+            <div class="field"><label for="watermark">Watermark text</label><input type="text" id="watermark" name="watermark" data-type="str" placeholder="made with MoneyPrinterCannon"></div>
             <div class="field">
               <label for="outro_seconds">End card length <output id="outro_seconds_out">2.5 s</output></label>
               <input type="range" id="outro_seconds" name="outro_seconds" data-type="float" min="0" max="8" step="0.5" value="2.5">
@@ -522,7 +522,7 @@ kbd{font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const STAGES = ['script','voice','timing','visuals','music','render'];
-const LS_FORM = 'cashcannon.form.v1';
+const LS_FORM = 'moneyprintercannon.form.v1';
 const state = {
   meta: null, health: null, defaults: null,
   tasks: [], selected: null, selectedState: null, selectedLoadedVideo: null,
@@ -681,7 +681,7 @@ $('#fireBtn').addEventListener('click', async () => {
 // ------------------------------------------------------------------ presets
 $('#exportBtn').addEventListener('click', () => {
   const blob = new Blob([JSON.stringify(readForm(), null, 2)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'cashcannon-preset.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'moneyprintercannon-preset.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 });
 $('#importBtn').addEventListener('click', () => $('#importFile').click());
 $('#importFile').addEventListener('change', async (e) => {

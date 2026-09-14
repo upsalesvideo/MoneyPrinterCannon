@@ -13,13 +13,13 @@ ROOT = Path(__file__).resolve().parent.parent
 @pytest.fixture(autouse=True)
 def _isolated_storage(tmp_path, monkeypatch):
     """Point config paths at a temp dir so tests never touch the real storage/."""
-    from cashcannon import config
+    from moneyprintercannon import config
 
     storage = tmp_path / "storage"
     monkeypatch.setattr(config, "STORAGE", storage)
     monkeypatch.setattr(config, "TASKS_DIR", storage / "tasks")
     monkeypatch.setattr(config, "CACHE_DIR", storage / "cache")
-    for mod in ("cashcannon.stock", "cashcannon.music", "cashcannon.pipeline", "cashcannon.render", "cashcannon.cli"):
+    for mod in ("moneyprintercannon.stock", "moneyprintercannon.music", "moneyprintercannon.pipeline", "moneyprintercannon.render", "moneyprintercannon.cli"):
         try:
             m = __import__(mod, fromlist=["x"])
         except Exception:

@@ -2,9 +2,9 @@ import json
 
 import pytest
 
-from cashcannon.schema import Script, Timing, VideoParams
-from cashcannon.timing import align_words, build_timing, proportional_words, tokenize
-from cashcannon.tts import SceneAudio
+from moneyprintercannon.schema import Script, Timing, VideoParams
+from moneyprintercannon.timing import align_words, build_timing, proportional_words, tokenize
+from moneyprintercannon.tts import SceneAudio
 
 
 def test_proportional_words_inside_bounds_and_monotonic():

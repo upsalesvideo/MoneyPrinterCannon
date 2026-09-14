@@ -86,7 +86,7 @@ const SceneMedia: React.FC<{scene: Scene; lengthFrames: number}> = ({scene, leng
       pauseWhenBuffering={false}
       onError={(e) => {
         // eslint-disable-next-line no-console
-        console.warn('[cashcannon] video failed', scene.src, e);
+        console.warn('[moneyprintercannon] video failed', scene.src, e);
       }}
       style={mediaStyle}
     />

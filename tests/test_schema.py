@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from cashcannon.schema import STAGES, Script, TaskState, VideoParams, VisualAsset, new_task_id
+from moneyprintercannon.schema import STAGES, Script, TaskState, VideoParams, VisualAsset, new_task_id
 
 
 def test_defaults_produce_vertical_short():

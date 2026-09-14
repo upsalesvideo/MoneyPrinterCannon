@@ -52,9 +52,9 @@ export const demoProps: VideoProps = {
     strokeColor: '#0a0e0c',
   },
   title: {text: 'Why cats sleep 16 h', durSec: 0},
-  outro: {text: 'Follow for more', sub: '@cashcannon', durSec: 2.5},
+  outro: {text: 'Follow for more', sub: '@moneyprintercannon', durSec: 2.5},
   transition: 'fade',
   progressBar: true,
-  watermark: {text: 'made with CashCannon'},
+  watermark: {text: 'made with MoneyPrinterCannon'},
   theme: {accent: '#10b981', bg: '#0a0e0c', font: 'Onest'},
 };

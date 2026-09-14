@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CashCannon helper for AI agents: install → configure → generate → print result block.
+"""MoneyPrinterCannon helper for AI agents: install → configure → generate → print result block.
 
 Exit codes: 0 success, 10 needs input (missing credentials), 1 generation failed, 2 bad usage.
 Never prints secrets.
@@ -14,8 +14,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO = "https://github.com/upsalesvideo/cashcannon.git"
-HOME = Path(os.environ.get("CANNON_HOME", Path.home() / "cashcannon")).expanduser()
+REPO = "https://github.com/upsalesvideo/MoneyPrinterCannon.git"
+HOME = Path(os.environ.get("CANNON_HOME", Path.home() / "moneyprintercannon")).expanduser()
 REQUIRED = ["GENOSAI_API_KEY"]
 OPTIONAL = ["PEXELS_API_KEY", "PIXABAY_API_KEY"]
 
@@ -44,7 +44,7 @@ def ensure_project() -> None:
             pass
         return
     HOME.parent.mkdir(parents=True, exist_ok=True)
-    print(f"[cannon] cloning CashCannon into {HOME}", file=sys.stderr)
+    print(f"[cannon] cloning MoneyPrinterCannon into {HOME}", file=sys.stderr)
     sh(["git", "clone", "--depth", "1", REPO, str(HOME)])
 
 
@@ -94,7 +94,7 @@ def ensure_remotion() -> None:
 
 
 def run_make(py: Path, topic: str, extra: list[str], resume: str | None) -> int:
-    cmd = [str(py), "-m", "cashcannon.cli"]
+    cmd = [str(py), "-m", "moneyprintercannon.cli"]
     if resume:
         cmd += ["resume", resume, "--json"]
     else:
@@ -131,7 +131,7 @@ def print_result(data: dict) -> int:
 
 
 def run_batch(py: Path, manifest: Path, extra: list[str]) -> int:
-    cmd = [str(py), "-m", "cashcannon.cli", "batch", str(manifest.resolve()), "--yes", *extra]
+    cmd = [str(py), "-m", "moneyprintercannon.cli", "batch", str(manifest.resolve()), "--yes", *extra]
     proc = subprocess.run(cmd, cwd=HOME, text=True, capture_output=True)
     sys.stderr.write(proc.stderr[-6000:])
     try:
@@ -147,7 +147,7 @@ def run_batch(py: Path, manifest: Path, extra: list[str]) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="CashCannon agent helper")
+    ap = argparse.ArgumentParser(description="MoneyPrinterCannon agent helper")
     ap.add_argument("--topic", help="video topic / idea")
     ap.add_argument("--batch", help="JSONL/JSON manifest with tasks")
     ap.add_argument("--resume", help="task_id to resume")

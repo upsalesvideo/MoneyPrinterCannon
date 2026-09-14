@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from cashcannon import pipeline
-from cashcannon.schema import STAGES, Script, TaskResult, VideoParams
+from moneyprintercannon import pipeline
+from moneyprintercannon.schema import STAGES, Script, TaskResult, VideoParams
 
 
 @pytest.fixture

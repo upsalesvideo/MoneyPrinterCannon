@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from cashcannon import stock
-from cashcannon.schema import Scene
+from moneyprintercannon import stock
+from moneyprintercannon.schema import Scene
 
 
 class FakeResp:

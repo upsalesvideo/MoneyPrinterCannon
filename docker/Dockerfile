@@ -1,4 +1,4 @@
-# CashCannon — API + WebUI + Remotion renderer in one image.
+# MoneyPrinterCannon — API + WebUI + Remotion renderer in one image.
 # Build:  docker compose build      Run: docker compose up
 # NOTE: not yet verified by an actual build (Docker was unavailable on the authoring machine).
 FROM python:3.12-slim-bookworm
@@ -35,7 +35,7 @@ RUN cd remotion && (test -f package-lock.json && npm ci --no-audit --no-fund || 
 
 # Python deps + project.
 COPY pyproject.toml README.md* ./
-COPY cashcannon ./cashcannon
+COPY moneyprintercannon ./moneyprintercannon
 RUN uv pip install --system --no-cache .
 
 # Rest of the project (webui, remotion sources, skill, examples).
@@ -56,4 +56,4 @@ EXPOSE 8787
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD curl -fsS http://127.0.0.1:8787/api/health || exit 1
 
-CMD ["uvicorn", "cashcannon.api:app", "--host", "0.0.0.0", "--port", "8787"]
+CMD ["uvicorn", "moneyprintercannon.api:app", "--host", "0.0.0.0", "--port", "8787"]

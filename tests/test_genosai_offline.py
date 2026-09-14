@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from cashcannon import genosai
-from cashcannon.genosai import (GenosaiClient, GenosaiError, GenosaiValidationError, InsufficientCredits, RateLimited,
+from moneyprintercannon import genosai
+from moneyprintercannon.genosai import (GenosaiClient, GenosaiError, GenosaiValidationError, InsufficientCredits, RateLimited,
                                 _parse_retry_after, duration_choices, reference_spec)
 
 
@@ -84,7 +84,7 @@ def test_duration_and_reference_helpers(client):
     assert duration_choices(client.model_info("kling-3.0")) == ([], 3, 15)
     assert reference_spec(client.model_info("grok-imagine-1.5")) == ("image_urls", True, 1)
     assert reference_spec(client.model_info("z-image")) == ("", False, 0)
-    from cashcannon.visuals import pick_video_duration, video_needs_image
+    from moneyprintercannon.visuals import pick_video_duration, video_needs_image
 
     assert pick_video_duration(client, "grok-imagine-1.5", 5.2) == 6
     assert pick_video_duration(client, "grok-imagine-1.5", 40) == 15

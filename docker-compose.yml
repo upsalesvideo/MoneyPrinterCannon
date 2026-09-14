@@ -1,10 +1,10 @@
 services:
-  cashcannon:
+  moneyprintercannon:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    image: cashcannon:latest
-    container_name: cashcannon
+    image: moneyprintercannon:latest
+    container_name: moneyprintercannon
     restart: unless-stopped
     ports:
       - "${CANNON_PORT:-8787}:8787"

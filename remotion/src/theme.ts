@@ -1,4 +1,4 @@
-// Types + visual constants for the CashCannon renderer.
+// Types + visual constants for the MoneyPrinterCannon renderer.
 // The props shape mirrors CONTRACT.md → "Remotion props.json" literally.
 
 export type Aspect = '9:16' | '16:9' | '1:1';

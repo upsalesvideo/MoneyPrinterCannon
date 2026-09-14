@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from cashcannon.render import build_props, make_cover, mix_audio, verify_output
-from cashcannon.schema import SceneTiming, Script, Timing, VideoParams, VisualAsset, Word
+from moneyprintercannon.render import build_props, make_cover, mix_audio, verify_output
+from moneyprintercannon.schema import SceneTiming, Script, Timing, VideoParams, VisualAsset, Word
 from tests.conftest import ffmpeg_available
 
 REQUIRED_TOP = {"aspect", "width", "height", "fps", "durationSec", "scenes", "words", "captions", "title", "outro",
@@ -33,7 +33,7 @@ def test_build_props_contract(tmp_path):
     script, timing, visuals = _fixture()
     task_dir = tmp_path / "20260101-000000-abc123"
     task_dir.mkdir()
-    params = VideoParams(topic="Cats", title_card=True, outro_text="Follow for more", outro_sub="@me", watermark="made with CashCannon")
+    params = VideoParams(topic="Cats", title_card=True, outro_text="Follow for more", outro_sub="@me", watermark="made with MoneyPrinterCannon")
     props = build_props(script, timing, visuals, params, task_dir)
     assert REQUIRED_TOP <= set(props)
     assert (props["width"], props["height"], props["fps"]) == (1080, 1920, 30)
@@ -50,7 +50,7 @@ def test_build_props_contract(tmp_path):
     assert props["captions"]["preset"] == "karaoke" and props["captions"]["fontSize"] == 78 and props["captions"]["maxWords"] == 3
     assert props["title"] == {"text": "Why cats sleep", "durSec": 0}
     assert props["outro"] == {"text": "Follow for more", "sub": "@me", "durSec": 2.5}
-    assert props["watermark"] == {"text": "made with CashCannon"}
+    assert props["watermark"] == {"text": "made with MoneyPrinterCannon"}
     assert props["theme"]["font"] == "Onest" and props["transition"] == "fade"
     json.dumps(props)  # serialisable
 

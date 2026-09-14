@@ -19,7 +19,7 @@ from .schema import Scene
 
 SEARCH_TTL = 24 * 3600
 ORIENTATION = {"9:16": "portrait", "16:9": "landscape", "1:1": "square"}
-UA = "CashCannon/0.1 (+https://github.com/cashcannon)"
+UA = "MoneyPrinterCannon/0.1 (+https://github.com/moneyprintercannon)"
 
 
 class StockUnavailable(RuntimeError):

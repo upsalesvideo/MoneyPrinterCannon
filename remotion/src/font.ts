@@ -58,7 +58,7 @@ export const ensureFont = (): void => {
     .then((ok) => {
       if (!ok.some(Boolean)) {
         // eslint-disable-next-line no-console
-        console.warn('[cashcannon] Onest could not be loaded, falling back to system-ui');
+        console.warn('[moneyprintercannon] Onest could not be loaded, falling back to system-ui');
       }
     })
     .catch(() => undefined)

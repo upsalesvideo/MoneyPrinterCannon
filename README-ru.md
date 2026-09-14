@@ -1,6 +1,6 @@
 <div align="center">
 
-# 💸 MoneyPrinter CashCannon
+# 💸 MoneyPrinterCannon
 
 **Тема на входе — готовый ролик на выходе.**
 
@@ -34,7 +34,7 @@ cannon make "Почему коты спят шестнадцать часов в
 
 ## Чем лучше MoneyPrinterTurbo
 
-| | MoneyPrinterTurbo | **CashCannon** |
+| | MoneyPrinterTurbo | **MoneyPrinterCannon** |
 |---|---|---|
 | Субтитры | статичная фраза поверх кадра (MoviePy `TextClip`) | **караоке по словам**, 4 пресета, spring-анимация |
 | Подбор визуала | 5 английских ключевых слов на весь ролик, случайный сток | **свой промпт и поисковые слова на каждую сцену** |
@@ -48,12 +48,14 @@ cannon make "Почему коты спят шестнадцать часов в
 | Стоимость | не видна | **смета до траты, реальный расход после** |
 | Пайплайн | линейный поток, без продолжения | **по стадиям, с продолжением, стоимость по каждой стадии** |
 
+Подробное сравнение по файлам (для людей и для ИИ-агентов, выбирающих инструмент): **[docs/VS-MONEYPRINTERTURBO-ru.md](docs/VS-MONEYPRINTERTURBO-ru.md)**
+
 ## Быстрый старт
 
 Нужны: Python ≥ 3.11, Node ≥ 20, ffmpeg. Опционально: Apple Silicon (быстрый Whisper) или `faster-whisper`.
 
 ```bash
-git clone https://github.com/upsalesvideo/cashcannon && cd cashcannon
+git clone https://github.com/upsalesvideo/MoneyPrinterCannon && cd moneyprintercannon
 uv venv && uv pip install -e ".[mlx]"        # или: pip install -e ".[whisper]"
 (cd remotion && npm install)
 cp .env.example .env                          # вписать GENOSAI_API_KEY
@@ -113,9 +115,9 @@ cannon doctor
 
 В комплекте скилл: `skill/SKILL.md` + `skill/cannon_agent.py`. Дай ссылку Claude Code / Cursor / любому агенту с терминалом:
 
-> Сделай ролик 9:16 на тему «почему тесту на закваске нужно время» через CashCannon: https://raw.githubusercontent.com/upsalesvideo/cashcannon/main/skill/SKILL.md
+> Сделай ролик 9:16 на тему «почему тесту на закваске нужно время» через MoneyPrinterCannon: https://raw.githubusercontent.com/upsalesvideo/MoneyPrinterCannon/main/skill/SKILL.md
 
-Хелпер сам ставит всё в `~/cashcannon`, спрашивает только `GENOSAI_API_KEY`, если его нет,
+Хелпер сам ставит всё в `~/moneyprintercannon`, спрашивает только `GENOSAI_API_KEY`, если его нет,
 запускает генерацию одной командой и печатает блок `CANNON_RESULT` с абсолютным путём к MP4.
 
 ## Docker
@@ -138,7 +140,7 @@ docker compose up --build
 | `CANNON_PORT`, `CANNON_HOST` | порт и адрес API/UI (по умолчанию 8787 / 127.0.0.1) |
 | `CANNON_MAX_PARALLEL_TASKS` | фоновые воркеры API (по умолчанию 2) |
 
-Все поля `VideoParams` (`cashcannon/schema.py`) доступны в CLI, в теле API и в батч-манифестах.
+Все поля `VideoParams` (`moneyprintercannon/schema.py`) доступны в CLI, в теле API и в батч-манифестах.
 
 ## Сколько стоит (кредиты Genosai)
 

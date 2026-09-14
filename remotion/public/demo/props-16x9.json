@@ -130,13 +130,13 @@
   },
   "outro": {
     "text": "Follow for more",
-    "sub": "@cashcannon",
+    "sub": "@moneyprintercannon",
     "durSec": 2.5
   },
   "transition": "slide",
   "progressBar": true,
   "watermark": {
-    "text": "made with CashCannon"
+    "text": "made with MoneyPrinterCannon"
   },
   "theme": {
     "accent": "#10b981",

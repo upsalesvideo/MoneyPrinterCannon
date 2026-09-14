@@ -1,6 +1,6 @@
-# CashCannon — internal module contract (read before writing any code)
+# MoneyPrinterCannon — internal module contract (read before writing any code)
 
-CashCannon = "topic → finished short video" generator. Everything AI goes through the
+MoneyPrinterCannon = "topic → finished short video" generator. Everything AI goes through the
 **Genosai Public API** (one key, `GENOSAI_API_KEY`): LLM script, TTS voice, AI images,
 AI video, Suno music. Free stock footage (Pexels / Pixabay) is an optional visual source.
 Rendering = **Remotion** (karaoke word-level captions, Ken Burns, transitions) + ffmpeg
@@ -9,7 +9,7 @@ Rendering = **Remotion** (karaoke word-level captions, Ken Burns, transitions) +
 Repo layout (fixed):
 
 ```
-cashcannon/                 python package (src)
+moneyprintercannon/                 python package (src)
   config.py                 settings from env (.env supported), paths
   schema.py                 pydantic models: VideoParams, TaskState, Script, ...  ← SOURCE OF TRUTH
   genosai.py                Genosai API client (chat, tts, photo, video, music, uploads, models, balance)
@@ -90,7 +90,7 @@ On exception: `state.status="failed"`, `state.failed_stage=stage`, `state.error=
   "outro":  {"text": "Follow for more", "sub": "@handle", "durSec": 2.5} | null,  // adds durSec to timeline
   "transition": "cut" | "fade" | "slide" | "zoom",
   "progressBar": true,
-  "watermark": {"text": "made with CashCannon"} | null,
+  "watermark": {"text": "made with MoneyPrinterCannon"} | null,
   "theme": {"accent": "#10b981", "bg": "#0a0e0c", "font": "Onest"}
 }
 ```

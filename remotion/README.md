@@ -1,6 +1,6 @@
-# cashcannon-remotion
+# moneyprintercannon-remotion
 
-Remotion renderer for CashCannon: scenes (image Ken Burns / looping video) +
+Remotion renderer for MoneyPrinterCannon: scenes (image Ken Burns / looping video) +
 transitions + karaoke word captions + title / outro / progress bar / watermark.
 Audio is **not** rendered here — `render.py` mixes voice and music with ffmpeg afterwards.
 
@@ -46,7 +46,7 @@ to `storage/tasks`, created by `render.py`). Absolute `http(s)://` URLs also wor
   "outro": {"text": "Follow for more", "sub": "@handle", "durSec": 2.5},
   "transition": "fade",                                     // cut|fade|slide|zoom
   "progressBar": true,
-  "watermark": {"text": "made with CashCannon"},
+  "watermark": {"text": "made with MoneyPrinterCannon"},
   "theme": {"accent": "#10b981", "bg": "#0a0e0c", "font": "Onest"}
 }
 ```

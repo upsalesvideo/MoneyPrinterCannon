@@ -17,7 +17,7 @@ from .config import REMOTION_DIR, STORAGE, settings
 from .estimate import estimate as make_estimate
 from .schema import STAGES, Stage, VideoParams
 
-app = typer.Typer(name="cannon", help="CashCannon — topic → finished short video (Genosai + Remotion).", no_args_is_help=True,
+app = typer.Typer(name="cannon", help="MoneyPrinterCannon — topic → finished short video (Genosai + Remotion).", no_args_is_help=True,
                   pretty_exceptions_enable=False)
 
 
@@ -366,11 +366,11 @@ def voices() -> None:
 @app.command()
 def serve(host: Optional[str] = typer.Option(None, "--host"), port: Optional[int] = typer.Option(None, "--port"),
           reload: bool = typer.Option(False, "--reload")) -> None:
-    """Start the REST API + web UI (uvicorn cashcannon.api:app)."""
+    """Start the REST API + web UI (uvicorn moneyprintercannon.api:app)."""
     _setup_logs()
     import uvicorn  # lazy: api.py is optional at import time
 
-    uvicorn.run("cashcannon.api:app", host=host or settings.host, port=port or settings.port, reload=reload, log_level="info")
+    uvicorn.run("moneyprintercannon.api:app", host=host or settings.host, port=port or settings.port, reload=reload, log_level="info")
 
 
 @app.command()
@@ -385,7 +385,7 @@ def doctor() -> None:
             ok = ok and good
         _say(f"  [{'ok' if good else ('!!' if required else '--')}] {name:22} {note}")
 
-    _say("CashCannon doctor")
+    _say("MoneyPrinterCannon doctor")
     row("GENOSAI_API_KEY", bool(settings.genosai_api_key), settings.genosai_api_host)
     if settings.genosai_api_key:
         try:

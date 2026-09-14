@@ -1,6 +1,6 @@
 import math
-from cashcannon.estimate import estimate, words_per_sec, image_price, tts_cost_for_text, video_price
-from cashcannon.schema import Script, VideoParams
+from moneyprintercannon.estimate import estimate, words_per_sec, image_price, tts_cost_for_text, video_price
+from moneyprintercannon.schema import Script, VideoParams
 
 
 def test_tts_cost_rules():

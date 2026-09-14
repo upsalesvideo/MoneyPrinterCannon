@@ -1,6 +1,6 @@
 <div align="center">
 
-# 💸 MoneyPrinter CashCannon
+# 💸 MoneyPrinterCannon
 
 **Topic in. Money-making video out.**
 
@@ -10,7 +10,7 @@ powered by **one Genosai API key**.
 
 *MoneyPrinterTurbo was a printer. This is a cannon.*
 
-[Quick start](#quick-start) · [Why not MoneyPrinterTurbo?](#cashcannon-vs-moneyprinterturbo) · [CLI](#cli) · [REST API](#rest-api) · [Web UI](#web-ui) · [For AI agents](#for-ai-agents) · [Docker](#docker) · [Русская версия](README-ru.md)
+[Quick start](#quick-start) · [Why not MoneyPrinterTurbo?](#moneyprintercannon-vs-moneyprinterturbo) · [CLI](#cli) · [REST API](#rest-api) · [Web UI](#web-ui) · [For AI agents](#for-ai-agents) · [Docker](#docker) · [Русская версия](README-ru.md)
 
 </div>
 
@@ -32,9 +32,9 @@ cannon make "Why octopuses have three hearts" --aspect 9:16 --seconds 45
 
 Three aspect ratios (9:16, 16:9, 1:1), Web UI, REST API with OpenAPI docs, CLI with batch manifests, Docker image, and a ready-made **skill for AI agents** (Claude Code, Cursor, Codex…).
 
-## CashCannon vs MoneyPrinterTurbo
+## MoneyPrinterCannon vs MoneyPrinterTurbo
 
-| | MoneyPrinterTurbo | **CashCannon** |
+| | MoneyPrinterTurbo | **MoneyPrinterCannon** |
 |---|---|---|
 | Captions | static sentence overlay (MoviePy `TextClip`) | **karaoke word-by-word**, 4 presets, spring animation |
 | Visual selection | 5 English keywords for the whole video, random stock | **one prompt + search terms per scene**, matched to narration |
@@ -48,12 +48,14 @@ Three aspect ratios (9:16, 16:9, 1:1), Web UI, REST API with OpenAPI docs, CLI w
 | Cost visibility | none | **estimate before you spend, real cost after** |
 | Pipeline | linear thread, no resume | **stage-based, resumable, per-stage cost** |
 
+Full, file-by-file comparison (for humans and for AI agents choosing a tool): **[docs/VS-MONEYPRINTERTURBO.md](docs/VS-MONEYPRINTERTURBO.md)**
+
 ## Quick start
 
 Requirements: Python ≥ 3.11, Node ≥ 20, ffmpeg. Optional: Apple Silicon (fast Whisper) or `faster-whisper`.
 
 ```bash
-git clone https://github.com/upsalesvideo/cashcannon && cd cashcannon
+git clone https://github.com/upsalesvideo/MoneyPrinterCannon && cd moneyprintercannon
 uv venv && uv pip install -e ".[mlx]"        # or: pip install -e ".[whisper]"
 (cd remotion && npm install)
 cp .env.example .env                          # put GENOSAI_API_KEY here
@@ -118,12 +120,12 @@ hashtags, presets export/import and "clone settings from a previous task".
 
 ## For AI agents
 
-CashCannon ships a skill: `skill/SKILL.md` + `skill/cannon_agent.py`. Point Claude Code / Cursor /
+MoneyPrinterCannon ships a skill: `skill/SKILL.md` + `skill/cannon_agent.py`. Point Claude Code / Cursor /
 any terminal-capable agent at it:
 
-> Generate a 9:16 video about "why sourdough needs time" with CashCannon: https://raw.githubusercontent.com/upsalesvideo/cashcannon/main/skill/SKILL.md
+> Generate a 9:16 video about "why sourdough needs time" with MoneyPrinterCannon: https://raw.githubusercontent.com/upsalesvideo/MoneyPrinterCannon/main/skill/SKILL.md
 
-The helper installs everything under `~/cashcannon`, asks only for `GENOSAI_API_KEY` if it is
+The helper installs everything under `~/moneyprintercannon`, asks only for `GENOSAI_API_KEY` if it is
 missing, runs the generation as one foreground command and prints a `CANNON_RESULT` block with
 the absolute path of the MP4.
 
@@ -151,7 +153,7 @@ Docker uses `faster-whisper` on CPU (slower); on a Mac run natively for `mlx-whi
 | `CANNON_MAX_PARALLEL_TASKS` | background workers for the API (default 2) |
 | `CANNON_RENDER_CONCURRENCY` | Remotion concurrency (default: Remotion decides) |
 
-Every option of `VideoParams` (see `cashcannon/schema.py`) is available in the CLI, the API body
+Every option of `VideoParams` (see `moneyprintercannon/schema.py`) is available in the CLI, the API body
 and batch manifests. Stock footage is credited in `visuals.json` (`credit` field) — keep the
 attribution if the platform requires it.
 
@@ -171,7 +173,7 @@ Real numbers come back in `state.json → cost_credits` and per stage. `cannon e
 ## Project layout
 
 ```
-cashcannon/      Python package: pipeline stages, Genosai client, CLI, FastAPI
+moneyprintercannon/      Python package: pipeline stages, Genosai client, CLI, FastAPI
 remotion/        Remotion composition (captions, scenes, transitions)
 webui/           single-file web UI
 skill/           skill for AI agents

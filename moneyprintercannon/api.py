@@ -21,9 +21,9 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
-from cashcannon import __version__
-from cashcannon.config import TASKS_DIR, WEBUI_DIR, settings
-from cashcannon.schema import (
+from moneyprintercannon import __version__
+from moneyprintercannon.config import TASKS_DIR, WEBUI_DIR, settings
+from moneyprintercannon.schema import (
     STAGES,
     Estimate,
     TaskState,
@@ -50,9 +50,9 @@ TRANSITIONS = ["cut", "fade", "slide", "zoom"]
 LANGUAGES = ["auto", "ru", "en", "es", "de", "fr", "pt", "it", "tr", "zh"]
 
 app = FastAPI(
-    title="CashCannon API",
+    title="MoneyPrinterCannon API",
     version=__version__,
-    description="Topic in. Money-making video out. REST API for the CashCannon short-video generator.",
+    description="Topic in. Money-making video out. REST API for the MoneyPrinterCannon short-video generator.",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -110,27 +110,27 @@ async def _any_exc(_: Request, exc: Exception):
 # ---------------------------------------------------------------------------
 def _pipeline():
     try:
-        from cashcannon import pipeline  # noqa: WPS433
+        from moneyprintercannon import pipeline  # noqa: WPS433
     except Exception as e:  # ImportError or a broken module
         raise ApiError(503, "PIPELINE_UNAVAILABLE",
-                       f"cashcannon.pipeline is not available yet ({e.__class__.__name__}: {e}). "
+                       f"moneyprintercannon.pipeline is not available yet ({e.__class__.__name__}: {e}). "
                        "The generator backend is still being built — read-only endpoints keep working.")
     return pipeline
 
 
 def _estimator():
     try:
-        from cashcannon import estimate as est  # noqa: WPS433
+        from moneyprintercannon import estimate as est  # noqa: WPS433
     except Exception as e:
         raise ApiError(503, "ESTIMATE_UNAVAILABLE",
-                       f"cashcannon.estimate is not available yet ({e.__class__.__name__}: {e}).")
+                       f"moneyprintercannon.estimate is not available yet ({e.__class__.__name__}: {e}).")
     return est
 
 
 def _genosai_client():
     """Returns a GenosaiClient or None when the module is missing."""
     try:
-        from cashcannon.genosai import GenosaiClient  # noqa: WPS433
+        from moneyprintercannon.genosai import GenosaiClient  # noqa: WPS433
     except Exception:
         return None
     try:
@@ -242,7 +242,7 @@ def _read_json(path: Path) -> Any:
 def _load_state(task_id: str) -> TaskState:
     d = _task_dir(task_id)
     try:
-        from cashcannon import pipeline  # noqa: WPS433
+        from moneyprintercannon import pipeline  # noqa: WPS433
 
         if hasattr(pipeline, "load_state"):
             return pipeline.load_state(task_id)
@@ -259,7 +259,7 @@ def _load_state(task_id: str) -> TaskState:
 def _load_params(task_id: str) -> VideoParams:
     d = _task_dir(task_id)
     try:
-        from cashcannon import pipeline  # noqa: WPS433
+        from moneyprintercannon import pipeline  # noqa: WPS433
 
         if hasattr(pipeline, "load_params"):
             return pipeline.load_params(task_id)
@@ -275,7 +275,7 @@ def _load_params(task_id: str) -> VideoParams:
 
 def _list_states(limit: int) -> list[TaskState]:
     try:
-        from cashcannon import pipeline  # noqa: WPS433
+        from moneyprintercannon import pipeline  # noqa: WPS433
 
         if hasattr(pipeline, "list_tasks"):
             return list(pipeline.list_tasks(limit=limit))
@@ -517,7 +517,7 @@ def get_task_video_variant(task_id: str, n: int, download: bool = False):
     p = d / _variant_name(n)
     if not p.is_file():
         raise ApiError(404, "VIDEO_NOT_READY", f"{p.name} is not rendered yet")
-    name = f"cashcannon-{task_id}" + ("" if n <= 1 else f"-v{n}") + ".mp4"
+    name = f"moneyprintercannon-{task_id}" + ("" if n <= 1 else f"-v{n}") + ".mp4"
     return _file_response(p, "video/mp4", name if download else None)
 
 
@@ -616,11 +616,11 @@ if WEBUI_DIR.is_dir():
 
 
 def main() -> None:
-    """`python -m cashcannon.api` — run the dev server with settings from env."""
+    """`python -m moneyprintercannon.api` — run the dev server with settings from env."""
     import uvicorn
 
     settings.ensure_dirs()
-    uvicorn.run("cashcannon.api:app", host=settings.host, port=settings.port, log_level=settings.log_level.lower())
+    uvicorn.run("moneyprintercannon.api:app", host=settings.host, port=settings.port, log_level=settings.log_level.lower())
 
 
 if __name__ == "__main__":
