@@ -1,0 +1,27 @@
+{
+  "name": "cashcannon-remotion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CashCannon Remotion renderer: scenes + Ken Burns + karaoke captions from props.json",
+  "type": "commonjs",
+  "scripts": {
+    "render": "remotion render src/index.ts Main out/demo.mp4 --props=public/demo/props.json --codec=h264 --crf=18 --muted --log=error",
+    "render:16x9": "remotion render src/index.ts Main out/demo-16x9.mp4 --props=public/demo/props-16x9.json --codec=h264 --crf=18 --muted --log=error",
+    "preview": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.509",
+    "@remotion/cli": "^4.0.509",
+    "@remotion/google-fonts": "^4.0.509",
+    "@remotion/renderer": "^4.0.509",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.509"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "5.9.3"
+  }
+}

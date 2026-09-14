@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoneyPrinter CashCannon</title>
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310b981'/%3E%3Ctext x='32' y='43' font-size='34' text-anchor='middle' font-family='system-ui' font-weight='800' fill='%230b0f0e'%3E%24%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0b0f0e; --card:#131a17; --card2:#182120; --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.12);
+  --text:#e6ebe8; --muted:#8a958f; --dim:#5f6a65;
+  --accent:#10b981; --accent-2:#fbbf24; --danger:#ef4444; --warn:#f59e0b; --info:#60a5fa;
+  --accent-soft:rgba(16,185,129,.14); --danger-soft:rgba(239,68,68,.14); --warn-soft:rgba(245,158,11,.14);
+  --r:14px; --r-s:9px; --shadow:0 10px 30px rgba(0,0,0,.35);
+  --font:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+::selection{background:var(--accent);color:#04120c}
+body{background:
+  radial-gradient(900px 500px at 10% -10%, rgba(16,185,129,.12), transparent 60%),
+  radial-gradient(700px 400px at 100% 0%, rgba(251,191,36,.06), transparent 60%),
+  var(--bg)}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:20;background:rgba(11,15,14,.82);backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#059669);display:grid;place-items:center;
+  color:#04120c;font-weight:900;font-size:18px;box-shadow:0 6px 18px rgba(16,185,129,.35)}
+.brand b{font-size:18px;letter-spacing:-.01em}
+.brand .tag{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .right{display:flex;align-items:center;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;border:1px solid var(--line2);background:var(--card);font-size:13px;color:var(--muted)}
+.badge b{color:var(--text);font-variant-numeric:tabular-nums}
+.badge .dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.badge.ok .dot{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.badge.bad .dot{background:var(--danger)}
+.top a.docs{color:var(--muted);text-decoration:none;font-size:13px;padding:6px 10px;border-radius:999px;border:1px solid transparent}
+.top a.docs:hover{border-color:var(--line2);color:var(--text)}
+
+/* ---------- banners / toasts ---------- */
+.banner{margin:16px 24px 0;padding:12px 16px;border-radius:var(--r);border:1px solid rgba(245,158,11,.35);background:var(--warn-soft);color:#fde68a;display:flex;gap:12px;align-items:flex-start}
+.banner code{background:rgba(0,0,0,.35);padding:2px 6px;border-radius:6px;font-family:var(--mono);font-size:12.5px}
+.banner.error{border-color:rgba(239,68,68,.35);background:var(--danger-soft);color:#fecaca}
+#toasts{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:50;max-width:min(420px,calc(100vw - 40px))}
+.toast{padding:11px 14px;border-radius:12px;background:#1b2523;border:1px solid var(--line2);box-shadow:var(--shadow);font-size:13px;animation:pop .18s ease-out}
+.toast.err{border-color:rgba(239,68,68,.4);background:#2a1616;color:#fecaca}
+.toast.ok{border-color:rgba(16,185,129,.4);background:#10231d;color:#a7f3d0}
+@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;padding:20px 24px 60px;max-width:1500px;margin:0 auto}
+@media (max-width:1000px){.layout{grid-template-columns:1fr}.top{padding:12px 16px}.brand .tag{display:none}.layout{padding:16px}.banner{margin:12px 16px 0}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+
+/* ---------- accordion sections ---------- */
+details.sec{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+details.sec+details.sec{margin-top:10px}
+details.sec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 16px;font-weight:600;user-select:none}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary .n{width:24px;height:24px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:12px;font-weight:700}
+details.sec>summary .hint{margin-left:auto;color:var(--dim);font-weight:400;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:50%}
+details.sec>summary .chev{width:18px;height:18px;color:var(--muted);transition:transform .2s;flex:none}
+details.sec[open]>summary .chev{transform:rotate(180deg)}
+details.sec>.body{padding:4px 16px 16px;display:grid;gap:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row.three{grid-template-columns:1fr 1fr 1fr}
+@media (max-width:560px){.row,.row.three{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,.lbl{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.field>label output{color:var(--text);font-variant-numeric:tabular-nums}
+input[type=text],input[type=number],select,textarea{width:100%;background:#0e1412;border:1px solid var(--line2);border-radius:var(--r-s);padding:9px 11px;outline:none;transition:border-color .15s,box-shadow .15s}
+input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea{resize:vertical;min-height:70px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a958f' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:6px 0}
+input[type=color]{width:38px;height:32px;padding:0;border:1px solid var(--line2);border-radius:8px;background:transparent;cursor:pointer}
+input[type=color]::-webkit-color-swatch-wrapper{padding:3px}
+input[type=color]::-webkit-color-swatch{border:none;border-radius:5px}
+.inline{display:flex;align-items:center;gap:10px}
+.inline .mono{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.check{display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 11px;border:1px solid var(--line);border-radius:var(--r-s);background:#0e1412}
+.check input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.check span{font-size:13px}
+.check small{display:block;color:var(--dim);font-size:11.5px}
+
+/* segmented control (aspect) */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:#0e1412;border:1px solid var(--line2);border-radius:var(--r-s);padding:4px}
+.seg label{position:relative;cursor:pointer}
+.seg input{position:absolute;opacity:0;inset:0;pointer-events:none}
+.seg .opt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border-radius:7px;color:var(--muted);font-size:12.5px;transition:background .15s,color .15s}
+.seg .opt i{display:block;border:2px solid currentColor;border-radius:3px}
+.seg input:checked+.opt{background:var(--accent-soft);color:var(--accent)}
+.seg input:focus-visible+.opt{outline:2px solid var(--accent)}
+
+/* radio cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.cards label{position:relative;cursor:pointer}
+.cards input{position:absolute;opacity:0;inset:0;pointer-events:none}
+.cards .opt{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:var(--r-s);border:1px solid var(--line);background:#0e1412;height:100%;transition:border-color .15s,background .15s}
+.cards .opt b{font-size:13px}
+.cards .opt small{color:var(--muted);font-size:11.5px;line-height:1.35}
+.cards .opt .price{margin-top:auto;padding-top:4px;font-size:11.5px;color:var(--accent-2);font-variant-numeric:tabular-nums}
+.cards input:checked+.opt{border-color:var(--accent);background:var(--accent-soft)}
+.cards input:focus-visible+.opt{outline:2px solid var(--accent)}
+
+/* caption presets */
+.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.presets label{position:relative;cursor:pointer}
+.presets input{position:absolute;opacity:0;inset:0;pointer-events:none}
+.presets .opt{border:1px solid var(--line);border-radius:var(--r-s);background:#0e1412;padding:8px;display:flex;flex-direction:column;gap:6px;height:100%}
+.presets input:checked+.opt{border-color:var(--accent);background:var(--accent-soft)}
+.presets .opt small{color:var(--muted);font-size:11.5px;text-transform:capitalize}
+.cap{height:52px;border-radius:7px;background:linear-gradient(135deg,#2a3b4d,#1b2a27);display:grid;place-items:center;overflow:hidden;font-weight:800;font-size:13px;letter-spacing:.01em}
+.cap span{padding:2px 5px;border-radius:4px}
+.cap.karaoke{text-transform:uppercase}.cap.karaoke .hl{background:var(--accent);color:#04120c}
+.cap.bold{text-transform:uppercase;font-size:15px;-webkit-text-stroke:.6px #000;text-shadow:0 2px 0 #000}.cap.bold .hl{color:var(--accent-2)}
+.cap.clean{font-weight:600;text-transform:none;text-shadow:0 1px 6px rgba(0,0,0,.7)}.cap.clean .hl{color:var(--accent)}
+.cap.minimal{font-weight:500;font-size:11.5px;text-transform:lowercase;color:#d5dbd8}.cap.minimal .hl{color:#fff;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+
+/* buttons */
+.btn{text-decoration:none;color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:10px;border:1px solid var(--line2);background:var(--card2);cursor:pointer;font-weight:600;font-size:13px;transition:filter .15s,transform .05s;white-space:nowrap}
+.btn:hover{filter:brightness(1.12)}.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#059669);border-color:transparent;color:#04120c;font-size:15px;padding:12px 18px;box-shadow:0 8px 24px rgba(16,185,129,.28)}
+.btn.ghost{background:transparent}
+.btn.danger{color:#fca5a5;border-color:rgba(239,68,68,.35)}
+.btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
+.btn.icon{padding:6px 8px}
+.btn svg{width:15px;height:15px}
+
+/* estimate panel */
+.est{position:sticky;bottom:12px;z-index:5;background:linear-gradient(180deg,#151d1a,#111815);border-color:var(--line2);box-shadow:var(--shadow)}
+.est .head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.est .total{font-size:26px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.est .total small{font-size:13px;color:var(--muted);font-weight:500;margin-left:6px}
+.est .status{font-size:12.5px;color:var(--muted)}
+.est .status.err{color:#fca5a5}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:12px;padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:#0e1412;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip b{color:var(--text);font-weight:600}
+.est .actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.est .actions .primary{flex:1}
+.est .notes{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:12px}
+.presetbar{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.presetbar .spacer{flex:1}
+
+/* tasks */
+.tasklist{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto;margin:0 -6px;padding:0 6px}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:var(--r-s);border:1px solid transparent;cursor:pointer;background:transparent}
+.task:hover{background:var(--card2)}
+.task.sel{border-color:var(--accent);background:var(--accent-soft)}
+.task .st{width:10px;height:10px;border-radius:50%;background:var(--dim)}
+.task .st.running{background:var(--info);animation:pulse 1.2s infinite}
+.task .st.succeeded{background:var(--accent)}.task .st.failed{background:var(--danger)}.task .st.cancelled{background:var(--warn)}.task .st.queued{background:var(--dim)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(96,165,250,.5)}70%{box-shadow:0 0 0 7px rgba(96,165,250,0)}}
+.task .t{min-width:0}.task .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.task .t small{color:var(--muted);font-size:11.5px}
+.task .meta{text-align:right;font-size:11.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.empty{padding:26px 12px;text-align:center;color:var(--muted);border:1px dashed var(--line2);border-radius:var(--r-s)}
+.empty b{display:block;color:var(--text);margin-bottom:4px}
+.listhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.listhead h3{margin:0}
+
+/* detail */
+.dhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.dhead h2{margin:0;font-size:17px;letter-spacing:-.01em;line-height:1.3}
+.dhead .id{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:2px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line2)}
+.status-pill.running{color:var(--info);border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.1)}
+.status-pill.succeeded{color:var(--accent);border-color:rgba(16,185,129,.4);background:var(--accent-soft)}
+.status-pill.failed{color:#fca5a5;border-color:rgba(239,68,68,.4);background:var(--danger-soft)}
+.status-pill.cancelled{color:#fcd34d;border-color:rgba(245,158,11,.4);background:var(--warn-soft)}
+.status-pill.queued{color:var(--muted)}
+.stages{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:14px 0 8px}
+.stage{text-align:center;font-size:11px;padding:6px 2px;border-radius:7px;background:#0e1412;border:1px solid var(--line);color:var(--dim);text-transform:capitalize;position:relative}
+.stage.running{color:var(--info);border-color:rgba(96,165,250,.5)}
+.stage.succeeded{color:var(--accent);border-color:rgba(16,185,129,.4);background:var(--accent-soft)}
+.stage.failed{color:#fca5a5;border-color:rgba(239,68,68,.5);background:var(--danger-soft)}
+.stage.skipped{color:var(--muted);text-decoration:line-through}
+.stage .cost{display:block;font-size:10px;color:var(--muted);text-transform:none}
+.bar{height:8px;border-radius:999px;background:#0e1412;border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#34d399);transition:width .4s;border-radius:999px}
+.bar.failed i{background:var(--danger)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px}
+.kv div{background:#0e1412;border:1px solid var(--line);border-radius:var(--r-s);padding:8px 10px}
+.kv small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.kv b{font-size:15px;font-variant-numeric:tabular-nums}
+.warns{margin:12px 0 0;display:flex;flex-direction:column;gap:6px}
+.warn{padding:8px 11px;border-radius:var(--r-s);background:var(--warn-soft);border:1px solid rgba(245,158,11,.3);color:#fde68a;font-size:12.5px}
+.warn.err{background:var(--danger-soft);border-color:rgba(239,68,68,.35);color:#fecaca;white-space:pre-wrap;font-family:var(--mono);font-size:12px}
+.dactions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.result{margin-top:14px;display:grid;gap:12px}
+.player{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:12px;align-items:start}
+.player video{width:100%;max-height:520px;background:#000;border-radius:var(--r-s);border:1px solid var(--line)}
+.player img{width:100%;border-radius:var(--r-s);border:1px solid var(--line);display:block}
+.player .side{display:flex;flex-direction:column;gap:8px}
+.player .side small{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+@media (max-width:560px){.player{grid-template-columns:1fr}}
+.copyrow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+.copyrow .val{background:#0e1412;border:1px solid var(--line);border-radius:var(--r-s);padding:8px 10px;font-size:13px;white-space:pre-wrap;word-break:break-word;min-height:36px}
+.copyrow .val.tags{color:var(--accent)}
+.dl{display:flex;flex-wrap:wrap;gap:8px}
+details.log{border:1px solid var(--line);border-radius:var(--r-s);margin-top:14px;background:#0a0e0d}
+details.log summary{list-style:none;cursor:pointer;padding:9px 12px;font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
+details.log summary::-webkit-details-marker{display:none}
+details.log pre{margin:0;padding:10px 12px;max-height:260px;overflow:auto;font:11.5px/1.5 var(--mono);color:#b6c1bb;border-top:1px solid var(--line);white-space:pre-wrap;word-break:break-word}
+.hidden,[hidden]{display:none!important}
+.muted{color:var(--muted)}
+.skel{height:14px;border-radius:6px;background:linear-gradient(90deg,#141c19,#1c2622,#141c19);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+kbd{font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo">$</div>
+    <div style="min-width:0">
+      <b>MoneyPrinter CashCannon</b>
+      <div class="tag">Topic in. Money-making video out.</div>
+    </div>
+  </div>
+  <div class="right">
+    <span id="balanceBadge" class="badge" title="Genosai credits"><span class="dot"></span><span class="skel" style="width:70px"></span></span>
+    <a class="docs" href="/docs" target="_blank" rel="noopener">API docs ↗</a>
+  </div>
+</header>
+
+<div id="banner" class="banner hidden"></div>
+
+<main class="layout">
+  <!-- ================= FORM ================= -->
+  <section class="col">
+    <form id="f" autocomplete="off" onsubmit="return false">
+
+      <details class="sec" open>
+        <summary><span class="n">1</span>Content<span class="hint" data-hint="content"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="body">
+          <div class="field">
+            <label for="topic">Topic / idea <span class="muted">what is the video about?</span></label>
+            <textarea id="topic" name="topic" data-type="str" rows="3" placeholder="e.g. Why cats sleep 16 hours a day — and what it means for you"></textarea>
+          </div>
+          <div class="row three">
+            <div class="field">
+              <label for="language">Language</label>
+              <select id="language" name="language" data-type="str">
+                <option value="auto">auto (same as topic)</option>
+                <option value="ru">Русский</option><option value="en">English</option><option value="es">Español</option>
+                <option value="de">Deutsch</option><option value="fr">Français</option><option value="pt">Português</option>
+                <option value="it">Italiano</option><option value="tr">Türkçe</option><option value="zh">中文</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="target_seconds">Length <output id="target_seconds_out">45 s</output></label>
+              <input type="range" id="target_seconds" name="target_seconds" data-type="int" min="15" max="180" step="5" value="45">
+            </div>
+            <div class="field">
+              <label for="text_model">Script model</label>
+              <select id="text_model" name="text_model" data-type="str" data-models="text"><option value="gemini-3-flash">gemini-3-flash</option></select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="style_hint">Style hint <span class="muted">tone, audience, CTA</span></label>
+            <input type="text" id="style_hint" name="style_hint" data-type="str" placeholder="confident finance-creator voice, hook in 2 s, end with 'follow for part 2'">
+          </div>
+          <div class="field">
+            <label for="script">…or paste your own script <span class="muted">leave empty to let the LLM write it</span></label>
+            <textarea id="script" name="script" data-type="str" rows="3" placeholder="Narration text. When set, the topic is used only for visuals & metadata."></textarea>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec">
+        <summary><span class="n">2</span>Visuals<span class="hint" data-hint="visuals"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="body">
+          <div class="field">
+            <span class="lbl">Aspect</span>
+            <div class="seg" id="aspectSeg">
+              <label><input type="radio" name="aspect" data-type="str" value="9:16" checked><span class="opt"><i style="width:14px;height:24px"></i>9:16 · Reels / Shorts</span></label>
+              <label><input type="radio" name="aspect" data-type="str" value="16:9"><span class="opt"><i style="width:26px;height:15px;margin:4.5px 0"></i>16:9 · YouTube</span></label>
+              <label><input type="radio" name="aspect" data-type="str" value="1:1"><span class="opt"><i style="width:20px;height:20px;margin:2px 0"></i>1:1 · Feed</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <span class="lbl">Visual source</span>
+            <div class="cards" id="vsCards">
+              <label><input type="radio" name="visual_source" data-type="str" value="ai_image" checked><span class="opt"><b>AI images</b><small>Stills + Ken Burns. Cheapest, always on-topic.</small><span class="price" data-price="ai_image">—</span></span></label>
+              <label><input type="radio" name="visual_source" data-type="str" value="ai_video"><span class="opt"><b>AI video</b><small>Generated clips per scene. Most premium.</small><span class="price" data-price="ai_video">—</span></span></label>
+              <label><input type="radio" name="visual_source" data-type="str" value="stock"><span class="opt"><b>Stock footage</b><small>Pexels / Pixabay. Free, needs API keys.</small><span class="price" data-price="stock">free</span></span></label>
+              <label><input type="radio" name="visual_source" data-type="str" value="mixed"><span class="opt"><b>Mixed</b><small>Stock first, AI image when nothing fits.</small><span class="price" data-price="mixed">—</span></span></label>
+              <label><input type="radio" name="visual_source" data-type="str" value="local"><span class="opt"><b>Local files</b><small>Your own clips / photos from disk.</small><span class="price" data-price="local">free</span></span></label>
+            </div>
+          </div>
+          <div class="field" id="localFilesField" hidden>
+            <label for="local_files">Local files <span class="muted">one absolute path per line</span></label>
+            <textarea id="local_files" name="local_files" data-type="list" rows="3" placeholder="/Users/me/clips/a.mp4&#10;/Users/me/clips/b.jpg"></textarea>
+          </div>
+          <div class="row three">
+            <div class="field">
+              <label for="image_model">Image model</label>
+              <select id="image_model" name="image_model" data-type="str" data-models="photo"><option value="z-image">z-image</option></select>
+            </div>
+            <div class="field">
+              <label for="video_model">Video model</label>
+              <select id="video_model" name="video_model" data-type="str" data-models="video"><option value="grok-imagine-1.5">grok-imagine-1.5</option></select>
+            </div>
+            <div class="field">
+              <label for="video_resolution">Video resolution</label>
+              <select id="video_resolution" name="video_resolution" data-type="str"><option>480p</option><option selected>720p</option><option>1080p</option></select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="visual_style">Visual style <span class="muted">appended to every prompt</span></label>
+            <input type="text" id="visual_style" name="visual_style" data-type="str">
+          </div>
+          <div class="row three">
+            <div class="field">
+              <label for="transition">Transition</label>
+              <select id="transition" name="transition" data-type="str"><option>cut</option><option selected>fade</option><option>slide</option><option>zoom</option></select>
+            </div>
+            <div class="field">
+              <label for="ken_burns">Ken Burns</label>
+              <select id="ken_burns" name="ken_burns" data-type="str"><option selected>auto</option><option>in</option><option>out</option><option>left</option><option>right</option><option>none</option></select>
+            </div>
+            <div class="field">
+              <label for="stock_provider">Stock provider</label>
+              <select id="stock_provider" name="stock_provider" data-type="str"><option selected>auto</option><option>pexels</option><option>pixabay</option></select>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec">
+        <summary><span class="n">3</span>Voice<span class="hint" data-hint="voice"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="body">
+          <div class="row three">
+            <div class="field">
+              <label for="voice">Voice <span class="muted">Gemini TTS</span></label>
+              <div class="inline">
+                <select id="voice" name="voice" data-type="str" style="flex:1"></select>
+                <button type="button" class="btn icon" id="randVoice" title="Random voice">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18h2.4a4 4 0 0 0 3.2-1.6L15.4 6.6A4 4 0 0 1 18.6 5H22M18 2l4 3-4 3M2 6h2.4a4 4 0 0 1 3.2 1.6L9 10M15 15l.4.6A4 4 0 0 0 18.6 17H22m-4-3 4 3-4 3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="voice_style">Style</label>
+              <select id="voice_style" name="voice_style" data-type="str"></select>
+            </div>
+            <div class="field">
+              <label for="voice_pace">Pace</label>
+              <select id="voice_pace" name="voice_pace" data-type="str"></select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="voice_temperature">Temperature <output id="voice_temperature_out">1.0</output></label>
+              <input type="range" id="voice_temperature" name="voice_temperature" data-type="float" min="0" max="2" step="0.1" value="1">
+            </div>
+            <div class="field">
+              <label for="voice_gap_ms">Gap between scenes <output id="voice_gap_ms_out">250 ms</output></label>
+              <input type="range" id="voice_gap_ms" name="voice_gap_ms" data-type="int" min="0" max="1500" step="50" value="250">
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec">
+        <summary><span class="n">4</span>Music<span class="hint" data-hint="music"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="body">
+          <div class="cards">
+            <label><input type="radio" name="music" data-type="str" value="none"><span class="opt"><b>None</b><small>Voice only.</small></span></label>
+            <label><input type="radio" name="music" data-type="str" value="genosai" checked><span class="opt"><b>Generate (Suno)</b><small>Track written for this script.</small><span class="price">≈ 16 credits</span></span></label>
+            <label><input type="radio" name="music" data-type="str" value="file"><span class="opt"><b>My file</b><small>Local mp3 / wav.</small></span></label>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="music_prompt">Music prompt <span class="muted">empty = from script mood</span></label>
+              <input type="text" id="music_prompt" name="music_prompt" data-type="str" placeholder="uplifting lo-fi, warm keys, no vocals">
+            </div>
+            <div class="field">
+              <label for="music_volume">Volume <output id="music_volume_out">18%</output></label>
+              <input type="range" id="music_volume" name="music_volume" data-type="float" min="0" max="0.6" step="0.01" value="0.18">
+            </div>
+          </div>
+          <div class="field" id="musicFileField" hidden>
+            <label for="music_file">Music file path</label>
+            <input type="text" id="music_file" name="music_file" data-type="str" placeholder="/Users/me/music/track.mp3">
+          </div>
+        </div>
+      </details>
+
+      <details class="sec">
+        <summary><span class="n">5</span>Captions<span class="hint" data-hint="captions"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="body">
+          <label class="check"><input type="checkbox" name="captions" data-type="bool" checked><span>Burn in karaoke captions <small>word-level highlight synced to the voice</small></span></label>
+          <div class="presets">
+            <label><input type="radio" name="caption_preset" data-type="str" value="karaoke" checked><span class="opt"><span class="cap karaoke"><span>MAKE <span class="hl">MONEY</span> FAST</span></span><small>karaoke</small></span></label>
+            <label><input type="radio" name="caption_preset" data-type="str" value="bold"><span class="opt"><span class="cap bold"><span>MAKE <span class="hl">MONEY</span></span></span><small>bold</small></span></label>
+            <label><input type="radio" name="caption_preset" data-type="str" value="clean"><span class="opt"><span class="cap clean"><span>Make <span class="hl">money</span> fast</span></span><small>clean</small></span></label>
+            <label><input type="radio" name="caption_preset" data-type="str" value="minimal"><span class="opt"><span class="cap minimal"><span>make <span class="hl">money</span> fast</span></span><small>minimal</small></span></label>
+          </div>
+          <div class="row three">
+            <div class="field">
+              <label for="caption_position">Position</label>
+              <select id="caption_position" name="caption_position" data-type="str"><option selected>bottom</option><option>center</option><option>top</option></select>
+            </div>
+            <div class="field">
+              <label for="caption_max_words">Words per line <output id="caption_max_words_out">3</output></label>
+              <input type="range" id="caption_max_words" name="caption_max_words" data-type="int" min="1" max="8" value="3">
+            </div>
+            <div class="field">
+              <label>Case</label>
+              <label class="check" style="padding:8px 11px"><input type="checkbox" name="caption_uppercase" data-type="bool" checked><span>UPPERCASE</span></label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Accent color <span class="muted">active word</span></label>
+              <div class="inline"><input type="color" name="accent_color" data-type="str" value="#10b981"><span class="mono" data-hex="accent_color">#10b981</span></div>
+            </div>
+            <div class="field">
+              <label>Emphasis color <span class="muted">numbers &amp; power words</span></label>
+              <div class="inline"><input type="color" name="emphasis_color" data-type="str" value="#fbbf24"><span class="mono" data-hex="emphasis_color">#fbbf24</span></div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec">
+        <summary><span class="n">6</span>Branding<span class="hint" data-hint="branding"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="body">
+          <div class="row">
+            <label class="check"><input type="checkbox" name="title_card" data-type="bool"><span>Title overlay at start <small>the hook as big text</small></span></label>
+            <label class="check"><input type="checkbox" name="progress_bar" data-type="bool" checked><span>Progress bar <small>thin accent line at the bottom</small></span></label>
+          </div>
+          <div class="row">
+            <div class="field"><label for="outro_text">End card text</label><input type="text" id="outro_text" name="outro_text" data-type="str" placeholder="Follow for more"></div>
+            <div class="field"><label for="outro_sub">End card second line</label><input type="text" id="outro_sub" name="outro_sub" data-type="str" placeholder="@yourhandle"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="watermark">Watermark text</label><input type="text" id="watermark" name="watermark" data-type="str" placeholder="made with CashCannon"></div>
+            <div class="field">
+              <label for="outro_seconds">End card length <output id="outro_seconds_out">2.5 s</output></label>
+              <input type="range" id="outro_seconds" name="outro_seconds" data-type="float" min="0" max="8" step="0.5" value="2.5">
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec">
+        <summary><span class="n">7</span>Output<span class="hint" data-hint="output"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="body">
+          <div class="row">
+            <label class="check"><input type="checkbox" name="cover" data-type="bool" checked><span>Cover image <small>cover.jpg from the strongest frame</small></span></label>
+            <label class="check"><input type="checkbox" name="social_meta" data-type="bool" checked><span>Social metadata <small>title, caption, hashtags</small></span></label>
+          </div>
+          <div class="field">
+            <label for="variants">Variants <output id="variants_out">1</output> <span class="muted">alternative cuts, visual reshuffle only</span></label>
+            <input type="range" id="variants" name="variants" data-type="int" min="1" max="5" value="1">
+          </div>
+        </div>
+      </details>
+    </form>
+
+    <div class="presetbar">
+      <span class="muted" style="font-size:12px">Form is saved in this browser automatically.</span>
+      <span class="spacer"></span>
+      <button type="button" class="btn sm ghost" id="resetBtn">Reset to defaults</button>
+      <button type="button" class="btn sm" id="exportBtn">Export preset (JSON)</button>
+      <button type="button" class="btn sm" id="importBtn">Import preset</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+
+    <div class="card est" id="est">
+      <div class="head">
+        <div>
+          <div class="total"><span id="estTotal">—</span><small>credits</small></div>
+          <div class="status" id="estStatus">Fill in a topic to see the estimate.</div>
+        </div>
+        <div style="text-align:right;font-size:12px" class="muted" id="estHint"></div>
+      </div>
+      <div class="chips" id="estChips"></div>
+      <ul class="notes hidden" id="estNotes"></ul>
+      <div class="actions">
+        <button type="button" class="btn primary" id="fireBtn">Fire the cannon 🚀</button>
+        <button type="button" class="btn" id="estBtn">Estimate only</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TASKS ================= -->
+  <aside class="col">
+    <div class="card">
+      <div class="listhead">
+        <h3>Videos</h3>
+        <button type="button" class="btn sm ghost" id="refreshBtn">Refresh</button>
+      </div>
+      <div class="tasklist" id="taskList"><div class="skel"></div></div>
+    </div>
+
+    <div class="card" id="detail">
+      <div class="empty"><b>No video selected</b>Pick one from the list, or fire the cannon.</div>
+    </div>
+  </aside>
+</main>
+
+<div id="toasts"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const STAGES = ['script','voice','timing','visuals','music','render'];
+const LS_FORM = 'cashcannon.form.v1';
+const state = {
+  meta: null, health: null, defaults: null,
+  tasks: [], selected: null, selectedState: null, selectedLoadedVideo: null,
+  pollTimer: null, estTimer: null, estSeq: 0, logOpen: false, lastLog: '', busy: false,
+};
+
+// ------------------------------------------------------------------ helpers
+async function api(path, opts = {}) {
+  const init = { method: opts.method || 'GET', headers: {} };
+  if (opts.body !== undefined) { init.headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(opts.body); }
+  let res;
+  try { res = await fetch(path, init); }
+  catch (e) { throw new Error('API is unreachable (' + e.message + ')'); }
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if (!res.ok) {
+    const err = new Error((data && data.message) || (typeof data === 'string' && data) || ('HTTP ' + res.status));
+    err.status = res.status; err.code = data && data.error; err.data = data;
+    throw err;
+  }
+  return data;
+}
+function toast(msg, kind = '') {
+  const el = document.createElement('div'); el.className = 'toast ' + kind; el.textContent = msg;
+  $('#toasts').appendChild(el); setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 320); }, kind === 'err' ? 6500 : 3500);
+}
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtCredits(n) { if (n == null || isNaN(n)) return '—'; return Number(n).toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+function ago(ts) {
+  if (!ts) return ''; const d = Date.now() / 1000 - ts;
+  if (d < 60) return 'just now'; if (d < 3600) return Math.floor(d / 60) + ' min ago'; if (d < 86400) return Math.floor(d / 3600) + ' h ago';
+  return new Date(ts * 1000).toLocaleDateString();
+}
+function dur(a, b) { if (!a) return ''; const s = Math.max(0, Math.round((b || Date.now() / 1000) - a)); return s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + (s % 60) + 's'; }
+async function copy(text, label) {
+  try { await navigator.clipboard.writeText(text); toast((label || 'Copied') + ' → clipboard', 'ok'); }
+  catch { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Copied', 'ok'); }
+}
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+// ------------------------------------------------------------------ form <-> params
+const form = $('#f');
+function controls() { return $$('[name]', form); }
+function readForm() {
+  const p = {};
+  for (const el of controls()) {
+    const k = el.name, t = el.dataset.type || 'str';
+    if (el.type === 'radio') { if (el.checked) p[k] = el.value; continue; }
+    if (el.type === 'checkbox') { p[k] = el.checked; continue; }
+    let v = el.value;
+    if (t === 'int') v = parseInt(v, 10); else if (t === 'float') v = parseFloat(v);
+    else if (t === 'list') v = v.split('\n').map(s => s.trim()).filter(Boolean);
+    p[k] = v;
+  }
+  return p;
+}
+function applyParams(p, { silent } = {}) {
+  for (const el of controls()) {
+    const k = el.name; if (!(k in p)) continue;
+    const v = p[k];
+    if (el.type === 'radio') { el.checked = String(el.value) === String(v); continue; }
+    if (el.type === 'checkbox') { el.checked = !!v; continue; }
+    if ((el.dataset.type || '') === 'list') { el.value = Array.isArray(v) ? v.join('\n') : (v || ''); continue; }
+    if (el.tagName === 'SELECT' && v != null && !Array.from(el.options).some(o => o.value === String(v))) {
+      const o = document.createElement('option'); o.value = v; o.textContent = v + ' (custom)'; el.appendChild(o);
+    }
+    el.value = v == null ? '' : v;
+  }
+  syncDerived();
+  if (!silent) onFormChange();
+}
+function syncDerived() {
+  const p = readForm();
+  $('#target_seconds_out').textContent = p.target_seconds + ' s';
+  $('#voice_temperature_out').textContent = Number(p.voice_temperature).toFixed(1);
+  $('#voice_gap_ms_out').textContent = p.voice_gap_ms + ' ms';
+  $('#music_volume_out').textContent = Math.round(p.music_volume * 100) + '%';
+  $('#caption_max_words_out').textContent = p.caption_max_words;
+  $('#outro_seconds_out').textContent = Number(p.outro_seconds).toFixed(1) + ' s';
+  $('#variants_out').textContent = p.variants;
+  $$('[data-hex]').forEach(s => s.textContent = p[s.dataset.hex]);
+  document.documentElement.style.setProperty('--accent-live', p.accent_color);
+  $('#localFilesField').hidden = p.visual_source !== 'local';
+  $('#musicFileField').hidden = p.music !== 'file';
+  // summaries
+  const h = (k, v) => { const el = $(`[data-hint="${k}"]`); if (el) el.textContent = v; };
+  h('content', (p.language === 'auto' ? 'auto' : p.language) + ' · ' + p.target_seconds + ' s · ' + p.text_model);
+  h('visuals', p.aspect + ' · ' + p.visual_source.replace('_', ' ') + ' · ' + (p.visual_source === 'ai_video' ? p.video_model : p.image_model));
+  h('voice', p.voice + ' · ' + p.voice_style + ' · ' + p.voice_pace);
+  h('music', p.music === 'none' ? 'off' : p.music === 'file' ? 'own file' : 'Suno · ' + Math.round(p.music_volume * 100) + '%');
+  h('captions', p.captions ? p.caption_preset + ' · ' + p.caption_position + ' · ' + p.caption_max_words + ' words' : 'off');
+  h('branding', [p.title_card && 'title', p.outro_text && 'end card', p.watermark && 'watermark', p.progress_bar && 'progress'].filter(Boolean).join(' · ') || 'plain');
+  h('output', (p.cover ? 'cover · ' : '') + (p.social_meta ? 'meta · ' : '') + p.variants + (p.variants > 1 ? ' variants' : ' variant'));
+  updatePriceTags(p);
+}
+function modelCost(cat, id) {
+  const m = state.meta && state.meta.models && state.meta.models[cat];
+  const hit = m && m.find(x => x.id === id); return hit && typeof hit.cost === 'number' ? hit.cost : null;
+}
+function updatePriceTags(p) {
+  const img = modelCost('photo', p.image_model), vid = modelCost('video', p.video_model);
+  const set = (k, v) => { const el = $(`[data-price="${k}"]`); if (el) el.textContent = v; };
+  set('ai_image', img != null ? `≈ ${fmtCredits(img)} credits / scene` : 'a few credits / scene');
+  set('ai_video', vid != null ? `≈ ${fmtCredits(vid)}+ credits / scene` : 'priciest option');
+  set('mixed', img != null ? `free · fallback ≈ ${fmtCredits(img)} / scene` : 'free · AI fallback');
+  const stockOk = state.health && (state.health.stock_configured.pexels || state.health.stock_configured.pixabay);
+  set('stock', stockOk ? 'free' : 'free · no API keys → falls back to AI images');
+}
+function saveForm() { try { localStorage.setItem(LS_FORM, JSON.stringify(readForm())); } catch {} }
+function loadForm() { try { const s = localStorage.getItem(LS_FORM); return s ? JSON.parse(s) : null; } catch { return null; } }
+
+// ------------------------------------------------------------------ estimate
+const estimateDebounced = debounce(runEstimate, 400);
+function onFormChange() { syncDerived(); saveForm(); estimateDebounced(); }
+form.addEventListener('input', onFormChange);
+form.addEventListener('change', onFormChange);
+
+async function runEstimate() {
+  const p = readForm(); const seq = ++state.estSeq;
+  const st = $('#estStatus'), chips = $('#estChips'), notes = $('#estNotes'), total = $('#estTotal');
+  if (!p.topic && !p.script) { total.textContent = '—'; chips.innerHTML = ''; notes.classList.add('hidden'); st.className = 'status'; st.textContent = 'Fill in a topic to see the estimate.'; return; }
+  st.className = 'status'; st.textContent = 'Estimating…';
+  try {
+    const e = await api('/api/estimate', { method: 'POST', body: p });
+    if (seq !== state.estSeq) return;
+    total.textContent = fmtCredits(e.total);
+    chips.innerHTML = Object.entries(e.breakdown || {}).filter(([, v]) => v).map(([k, v]) => `<span class="chip">${esc(k)} <b>${fmtCredits(v)}</b></span>`).join('');
+    if (e.notes && e.notes.length) { notes.classList.remove('hidden'); notes.innerHTML = e.notes.map(n => `<li>${esc(n)}</li>`).join(''); } else notes.classList.add('hidden');
+    const bal = state.meta && state.meta.balance && state.meta.balance.total;
+    if (bal != null && e.total > bal) { st.className = 'status err'; st.textContent = `Not enough credits: balance ${fmtCredits(bal)}. Top up or pick cheaper models.`; }
+    else st.textContent = 'Estimate before spending anything. Actual cost may differ ±20% (LLM tokens, retries).';
+  } catch (err) {
+    if (seq !== state.estSeq) return;
+    total.textContent = '?'; chips.innerHTML = ''; notes.classList.add('hidden');
+    st.className = 'status err';
+    st.textContent = err.status === 503 ? 'Estimator is not ready yet — the backend module is still being built.' : 'Estimate failed: ' + err.message;
+  }
+}
+
+// ------------------------------------------------------------------ fire
+$('#estBtn').addEventListener('click', runEstimate);
+$('#fireBtn').addEventListener('click', async () => {
+  const p = readForm();
+  if (!p.topic && !p.script) { toast('Give me a topic (or paste a script) first.', 'err'); $('#topic').focus(); return; }
+  if (state.health && !state.health.genosai_key_configured) { toast('GENOSAI_API_KEY is not configured on the server.', 'err'); return; }
+  const btn = $('#fireBtn'); btn.disabled = true; btn.textContent = 'Firing…';
+  try {
+    const r = await api('/api/tasks', { method: 'POST', body: p });
+    toast('Task ' + r.task_id + ' started' + (r.estimate ? ` · ≈ ${fmtCredits(r.estimate.total)} credits` : ''), 'ok');
+    await refreshTasks(); selectTask(r.task_id);
+  } catch (err) { toast(err.message, 'err'); }
+  finally { btn.disabled = false; btn.textContent = 'Fire the cannon 🚀'; }
+});
+
+// ------------------------------------------------------------------ presets
+$('#exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(readForm(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'cashcannon-preset.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('#importBtn').addEventListener('click', () => $('#importFile').click());
+$('#importFile').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const p = JSON.parse(await f.text()); if (typeof p !== 'object' || Array.isArray(p)) throw new Error('not an object'); applyParams(p); toast('Preset imported', 'ok'); }
+  catch (err) { toast('Cannot import preset: ' + err.message, 'err'); }
+  e.target.value = '';
+});
+$('#resetBtn').addEventListener('click', () => { if (state.defaults) { applyParams({ ...state.defaults, topic: readForm().topic }); toast('Defaults restored'); } });
+$('#randVoice').addEventListener('click', () => {
+  const sel = $('#voice'); const opts = Array.from(sel.options); if (!opts.length) return;
+  let pick; do { pick = opts[Math.floor(Math.random() * opts.length)].value; } while (opts.length > 1 && pick === sel.value);
+  sel.value = pick; onFormChange(); toast('Voice: ' + pick);
+});
+
+// ------------------------------------------------------------------ meta / health
+function fillSelect(sel, items, current) {
+  const cur = current ?? sel.value; sel.innerHTML = '';
+  for (const it of items) { const o = document.createElement('option'); o.value = it.id ?? it; o.textContent = it.name ? (it.name === it.id ? it.id : `${it.name} · ${it.id}`) + (typeof it.cost === 'number' ? ` · ${it.cost} cr` : '') : it; sel.appendChild(o); }
+  if (cur && !Array.from(sel.options).some(o => o.value === cur)) { const o = document.createElement('option'); o.value = cur; o.textContent = cur; sel.appendChild(o); }
+  if (cur) sel.value = cur;
+}
+function renderBalance(meta) {
+  const b = $('#balanceBadge');
+  if (meta.balance && meta.balance.total != null) {
+    b.className = 'badge ok'; b.innerHTML = `<span class="dot"></span>Genosai <b>${fmtCredits(meta.balance.total)}</b> credits`;
+    b.title = `main ${fmtCredits(meta.balance.main)} · bonus ${fmtCredits(meta.balance.bonus)}`;
+  } else {
+    b.className = 'badge bad'; b.innerHTML = `<span class="dot"></span>${meta.genosai_key_configured ? 'balance unavailable' : 'no Genosai key'}`;
+    b.title = meta.balance_error || '';
+  }
+}
+function showBanner(html, kind = '') { const el = $('#banner'); el.className = 'banner ' + kind; el.innerHTML = html; }
+function hideBanner() { $('#banner').className = 'banner hidden'; }
+
+async function loadMeta() {
+  try { state.health = await api('/api/health'); } catch (err) { showBanner('<b>API offline.</b> ' + esc(err.message), 'error'); return; }
+  if (!state.health.genosai_key_configured) {
+    showBanner(`<span>🔑</span><div><b>Genosai key is not configured.</b> The server needs <code>GENOSAI_API_KEY</code> to generate anything.
+      Put it in <code>.env</code> next to the package or run <code>export GENOSAI_API_KEY=sdk_...</code> and restart the API. Get a key at <a href="https://genosai.io" target="_blank" rel="noopener">genosai.io</a>.</div>`);
+  } else hideBanner();
+  try {
+    const meta = await api('/api/meta'); state.meta = meta; state.defaults = meta.defaults;
+    fillSelect($('#voice'), meta.voices, readForm().voice || meta.defaults.voice);
+    fillSelect($('#voice_style'), meta.voice_styles, readForm().voice_style || meta.defaults.voice_style);
+    fillSelect($('#voice_pace'), meta.voice_paces, readForm().voice_pace || meta.defaults.voice_pace);
+    const models = meta.models || {};
+    for (const sel of $$('[data-models]')) { const cat = sel.dataset.models; const list = models[cat] || []; if (list.length) fillSelect(sel, list, readForm()[sel.name] || meta.defaults[sel.name]); }
+    if (meta.models_error && state.health.genosai_key_configured) toast('Model list unavailable: ' + meta.models_error, 'err');
+    renderBalance(meta);
+    syncDerived();
+  } catch (err) {
+    $('#balanceBadge').className = 'badge bad'; $('#balanceBadge').innerHTML = '<span class="dot"></span>meta failed';
+    toast('Cannot load /api/meta: ' + err.message, 'err');
+  }
+}
+
+// ------------------------------------------------------------------ tasks
+async function refreshTasks() {
+  try {
+    state.tasks = await api('/api/tasks?limit=100'); renderTaskList();
+    if (state.selected) {
+      const s = state.tasks.find(t => t.task_id === state.selected);
+      if (s) { state.selectedState = s; renderDetail(); await refreshLog(); }
+      else { state.selected = null; state.selectedState = null; renderDetail(); }
+    }
+  } catch (err) { $('#taskList').innerHTML = `<div class="empty"><b>Cannot load tasks</b>${esc(err.message)}</div>`; }
+  schedulePoll();
+}
+function schedulePoll() {
+  clearTimeout(state.pollTimer);
+  const active = state.tasks.some(t => t.status === 'running' || t.status === 'queued');
+  state.pollTimer = setTimeout(refreshTasks, active ? 2000 : 15000);
+}
+function renderTaskList() {
+  const box = $('#taskList');
+  if (!state.tasks.length) { box.innerHTML = `<div class="empty"><b>No videos yet</b>Fill in the form and fire the cannon.</div>`; return; }
+  box.innerHTML = state.tasks.map(t => `
+    <div class="task ${t.task_id === state.selected ? 'sel' : ''}" data-id="${t.task_id}">
+      <span class="st ${t.status}"></span>
+      <div class="t"><b>${esc(t.topic || t.task_id)}</b><small>${t.status}${t.status === 'running' && t.stage ? ' · ' + t.stage : ''}${t.status === 'failed' && t.failed_stage ? ' at ' + t.failed_stage : ''} · ${ago(t.created_at)}</small></div>
+      <div class="meta">${t.progress}%<br>${fmtCredits(t.cost_credits)} cr</div>
+    </div>`).join('');
+}
+$('#taskList').addEventListener('click', e => { const el = e.target.closest('.task'); if (el) selectTask(el.dataset.id); });
+$('#refreshBtn').addEventListener('click', refreshTasks);
+
+async function selectTask(id) {
+  state.selected = id; state.selectedLoadedVideo = null; state.lastLog = '';
+  state.selectedState = state.tasks.find(t => t.task_id === id) || null;
+  renderTaskList(); renderDetail();
+  try { state.selectedState = await api('/api/tasks/' + id); renderDetail(); await refreshLog(); }
+  catch (err) { toast(err.message, 'err'); }
+}
+async function refreshLog() {
+  if (!state.selected || !state.logOpen) return;
+  try {
+    const txt = await fetch('/api/tasks/' + state.selected + '/log?tail=200').then(r => r.ok ? r.text() : '');
+    if (txt !== state.lastLog) { state.lastLog = txt; const pre = $('#logPre'); if (pre) { const stick = pre.scrollTop + pre.clientHeight >= pre.scrollHeight - 20; pre.textContent = txt || '(log is empty)'; if (stick) pre.scrollTop = pre.scrollHeight; } }
+  } catch {}
+}
+
+function renderDetail() {
+  const box = $('#detail'); const s = state.selectedState;
+  if (!s) { box.innerHTML = `<div class="empty"><b>No video selected</b>Pick one from the list, or fire the cannon.</div>`; return; }
+  const id = s.task_id, r = s.result || {};
+  const done = s.status === 'succeeded';
+  const failedStage = s.failed_stage;
+  const stages = STAGES.map(k => { const st = (s.stages && s.stages[k]) || {}; const cls = st.status || 'pending';
+    return `<div class="stage ${cls}" title="${esc(st.error || st.note || '')}">${k}${st.cost_credits ? `<span class="cost">${fmtCredits(st.cost_credits)} cr</span>` : (st.status === 'succeeded' ? '<span class="cost">✓</span>' : st.status === 'running' ? '<span class="cost">…</span>' : '')}</div>`; }).join('');
+  const startedAt = s.created_at, finishedAt = ['succeeded', 'failed', 'cancelled'].includes(s.status) ? s.updated_at : null;
+  const variants = Math.max(1, (r.variants && r.variants.length) || 0);
+  const canResume = ['failed', 'cancelled', 'queued'].includes(s.status) || (s.status === 'succeeded' && false);
+  const canCancel = ['running', 'queued'].includes(s.status);
+  const warns = (s.warnings || []).map(w => `<div class="warn">${esc(w)}</div>`).join('') + (s.error ? `<div class="warn err">${esc(s.error)}</div>` : '');
+  box.innerHTML = `
+    <div class="dhead">
+      <div style="min-width:0"><h2>${esc(s.topic || r.title || id)}</h2><div class="id">${id}</div></div>
+      <span class="status-pill ${s.status}">${s.status}${s.status === 'running' && s.stage ? ' · ' + s.stage : ''}${failedStage ? ' · ' + failedStage : ''}</span>
+    </div>
+    <div class="stages">${stages}</div>
+    <div class="bar ${s.status === 'failed' ? 'failed' : ''}"><i style="width:${s.progress || 0}%"></i></div>
+    <div class="kv">
+      <div><small>Spent</small><b>${fmtCredits(s.cost_credits)} cr</b></div>
+      <div><small>Estimate</small><b>${fmtCredits(s.estimate_credits)} cr</b></div>
+      <div><small>Progress</small><b>${s.progress || 0}%</b></div>
+      <div><small>${finishedAt ? 'Took' : 'Running'}</small><b>${dur(startedAt, finishedAt)}</b></div>
+    </div>
+    ${warns ? `<div class="warns">${warns}</div>` : ''}
+    <div class="dactions">
+      ${canResume ? `<button class="btn" data-act="resume">▶ Resume</button>` : ''}
+      ${done ? `<button class="btn" data-act="rerender" title="Re-run the render stage only (visual reshuffle keeps everything else)">↻ Re-render</button>` : ''}
+      ${canCancel ? `<button class="btn" data-act="cancel">■ Cancel</button>` : ''}
+      <button class="btn" data-act="clone">⎘ Clone settings into form</button>
+      <button class="btn" data-act="script" ${s.stages && s.stages.script && s.stages.script.status === 'succeeded' ? '' : 'disabled'}>{ } Script JSON</button>
+      <button class="btn danger" data-act="delete">Delete</button>
+    </div>
+    ${done ? `
+    <div class="result">
+      <div class="player">
+        <video id="player" controls playsinline preload="metadata" ${r.cover ? `poster="/api/tasks/${id}/cover"` : ''}></video>
+        <div class="side">
+          ${r.cover ? `<small>Cover</small><img src="/api/tasks/${id}/cover?t=${Math.round(s.updated_at)}" alt="cover">` : ''}
+          <small>Download</small>
+          <div class="dl" style="flex-direction:column">
+            ${Array.from({ length: variants }, (_, i) => i + 1).map(n => `<a class="btn sm" href="/api/tasks/${id}/video${n > 1 ? '/' + n : ''}?download=1">final${n > 1 ? '-' + n : ''}.mp4</a>`).join('')}
+            ${r.cover ? `<a class="btn sm" href="/api/tasks/${id}/files/cover.jpg" download>cover.jpg</a>` : ''}
+          </div>
+          ${variants > 1 ? `<small>Variants</small><div class="dl">${Array.from({ length: variants }, (_, i) => i + 1).map(n => `<button class="btn sm" data-variant="${n}">v${n}</button>`).join('')}</div>` : ''}
+        </div>
+      </div>
+      ${(r.title || r.caption || (r.hashtags && r.hashtags.length)) ? `
+      <div class="copyrow"><div class="val"><b>${esc(r.title || '(no title)')}</b></div><button class="btn sm" data-copy="title">Copy</button></div>
+      <div class="copyrow"><div class="val">${esc(r.caption || '(no caption)')}</div><button class="btn sm" data-copy="caption">Copy</button></div>
+      <div class="copyrow"><div class="val tags">${esc((r.hashtags || []).map(h => h.startsWith('#') ? h : '#' + h).join(' ') || '(no hashtags)')}</div><button class="btn sm" data-copy="hashtags">Copy</button></div>
+      <div style="text-align:right"><button class="btn sm ghost" data-copy="all">Copy title + caption + hashtags</button></div>` : ''}
+    </div>` : ''}
+    <details class="log" id="logBox" ${state.logOpen ? 'open' : ''}>
+      <summary>Log <span class="muted">· tail 200 lines · auto-refresh</span></summary>
+      <pre id="logPre">${esc(state.lastLog || 'Loading…')}</pre>
+    </details>`;
+
+  if (done) {
+    const v = $('#player'); const n = state.selectedLoadedVideo || 1;
+    v.src = `/api/tasks/${id}/video${n > 1 ? '/' + n : ''}`; state.selectedLoadedVideo = n;
+  }
+  $('#logBox').addEventListener('toggle', e => { state.logOpen = e.target.open; if (state.logOpen) refreshLog(); });
+  box.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => action(b.dataset.act, s)));
+  box.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.copy; const tags = (r.hashtags || []).map(h => h.startsWith('#') ? h : '#' + h).join(' ');
+    const txt = k === 'title' ? r.title : k === 'caption' ? r.caption : k === 'hashtags' ? tags : [r.title, r.caption, tags].filter(Boolean).join('\n\n');
+    copy(txt || '', k);
+  }));
+  box.querySelectorAll('[data-variant]').forEach(b => b.addEventListener('click', () => { const n = +b.dataset.variant; const v = $('#player'); v.src = `/api/tasks/${id}/video${n > 1 ? '/' + n : ''}`; state.selectedLoadedVideo = n; v.play().catch(() => {}); }));
+}
+
+async function action(act, s) {
+  const id = s.task_id;
+  try {
+    if (act === 'resume') { await api(`/api/tasks/${id}/resume`, { method: 'POST' }); toast('Resumed ' + id, 'ok'); }
+    else if (act === 'rerender') { await api(`/api/tasks/${id}/resume?force=true`, { method: 'POST' }); toast('Re-running ' + id, 'ok'); }
+    else if (act === 'cancel') { await api(`/api/tasks/${id}/cancel`, { method: 'POST' }); toast('Cancel requested'); }
+    else if (act === 'delete') {
+      if (!confirm(`Delete task ${id} and all its files?`)) return;
+      await api(`/api/tasks/${id}?force=true`, { method: 'DELETE' }); toast('Deleted ' + id); state.selected = null; state.selectedState = null;
+    }
+    else if (act === 'clone') {
+      const p = await api(`/api/tasks/${id}/params`); applyParams(p); $('details.sec').open = true; window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Settings loaded into the form', 'ok');
+      return;
+    }
+    else if (act === 'script') {
+      const sc = await api(`/api/tasks/${id}/script`);
+      const w = window.open('', '_blank'); if (w) { w.document.write('<pre style="font:13px/1.5 ui-monospace,Menlo,monospace;background:#0b0f0e;color:#e6ebe8;padding:20px;white-space:pre-wrap">' + esc(JSON.stringify(sc, null, 2)) + '</pre>'); w.document.title = 'script ' + id; }
+      return;
+    }
+    await refreshTasks();
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+// ------------------------------------------------------------------ boot
+(async function boot() {
+  const saved = loadForm(); if (saved) applyParams(saved, { silent: true });
+  syncDerived();
+  await loadMeta();
+  if (state.defaults && !saved) applyParams(state.defaults, { silent: true });
+  syncDerived(); saveForm();
+  await refreshTasks();
+  runEstimate();
+  setInterval(loadMeta, 120000); // balance refresh
+  document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') $('#fireBtn').click(); });
+})();
+})();
+</script>
+</body>
+</html>

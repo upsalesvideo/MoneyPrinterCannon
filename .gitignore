@@ -1,0 +1,12 @@
+.env
+storage/
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+remotion/public/tasks
+remotion/out/
+remotion/.remotion/
+.pytest_cache/
+*.log
+.DS_Store

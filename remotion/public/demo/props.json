@@ -1,0 +1,47 @@
+{
+  "aspect": "9:16",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "durationSec": 13,
+  "scenes": [
+    {"index": 1, "start": 0.0, "end": 2.5, "kind": "image", "src": "demo/scene-1.jpg", "fit": "cover", "kenBurns": "in"},
+    {"index": 2, "start": 2.5, "end": 8.0, "kind": "video", "src": "demo/clip-1.mp4", "fit": "cover", "kenBurns": "in", "loop": true, "srcDurationSec": 5.0},
+    {"index": 3, "start": 8.0, "end": 10.5, "kind": "image", "src": "demo/scene-3.jpg", "fit": "cover", "kenBurns": "left"}
+  ],
+  "words": [
+    {"s": 0.40, "e": 0.75, "w": "Cats"},
+    {"s": 0.80, "e": 1.10, "w": "sleep"},
+    {"s": 1.15, "e": 1.40, "w": "16"},
+    {"s": 1.45, "e": 1.90, "w": "hours"},
+    {"s": 2.50, "e": 2.70, "w": "a"},
+    {"s": 2.75, "e": 3.20, "w": "day"},
+    {"s": 4.20, "e": 4.50, "w": "and"},
+    {"s": 4.55, "e": 4.90, "w": "still"},
+    {"s": 5.00, "e": 5.50, "w": "earn"},
+    {"s": 5.60, "e": 6.20, "w": "$1000"},
+    {"s": 7.00, "e": 7.30, "w": "from"},
+    {"s": 7.35, "e": 7.80, "w": "every"},
+    {"s": 7.90, "e": 8.50, "w": "video"},
+    {"s": 9.00, "e": 9.40, "w": "you"},
+    {"s": 9.45, "e": 10.20, "w": "post"}
+  ],
+  "captions": {
+    "enabled": true,
+    "preset": "karaoke",
+    "position": "bottom",
+    "fontSize": 78,
+    "maxWords": 3,
+    "uppercase": true,
+    "accent": "#10b981",
+    "emphasis": "#fbbf24",
+    "textColor": "#ffffff",
+    "strokeColor": "#0a0e0c"
+  },
+  "title": {"text": "Why cats sleep 16 h", "durSec": 0},
+  "outro": {"text": "Follow for more", "sub": "@cashcannon", "durSec": 2.5},
+  "transition": "fade",
+  "progressBar": true,
+  "watermark": {"text": "made with CashCannon"},
+  "theme": {"accent": "#10b981", "bg": "#0a0e0c", "font": "Onest"}
+}

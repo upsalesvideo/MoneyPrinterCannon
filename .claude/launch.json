@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cashcannon",
+      "runtimeExecutable": "/Users/antonbogatushin/claudecide/cashcannon/.venv/bin/uvicorn",
+      "runtimeArgs": ["cashcannon.api:app", "--host", "127.0.0.1", "--port", "8787"],
+      "port": 8787
+    }
+  ]
+}

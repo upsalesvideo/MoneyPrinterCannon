@@ -1,0 +1,20 @@
+services:
+  cashcannon:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: cashcannon:latest
+    container_name: cashcannon
+    restart: unless-stopped
+    ports:
+      - "${CANNON_PORT:-8787}:8787"
+    env_file:
+      - .env
+    environment:
+      CANNON_HOST: 0.0.0.0
+      CANNON_PORT: "8787"
+      CANNON_STORAGE: /app/storage
+    volumes:
+      - ./storage:/app/storage
+    # Remotion/Chromium wants a bigger shared memory segment than Docker's 64 MB default.
+    shm_size: "1gb"
