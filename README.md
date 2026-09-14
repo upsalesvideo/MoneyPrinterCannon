@@ -47,6 +47,7 @@ Three aspect ratios (9:16, 16:9, 1:1), Web UI, REST API with OpenAPI docs, CLI w
 | Accounts needed | LLM + TTS + stock + music + video = 4–6 keys | **1 key** (Genosai) + optional free stock keys |
 | Cost visibility | none | **estimate before you spend, real cost after** |
 | Pipeline | linear thread, no resume | **stage-based, resumable, per-stage cost** |
+| Publishing | via **paid** upload-post.com | **free** via Composio managed OAuth (YouTube, Instagram, TikTok, LinkedIn) |
 
 Full, file-by-file comparison (for humans and for AI agents choosing a tool): **[docs/VS-MONEYPRINTERTURBO.md](docs/VS-MONEYPRINTERTURBO.md)**
 
@@ -56,7 +57,7 @@ Requirements: Python ≥ 3.11, Node ≥ 20, ffmpeg. Optional: Apple Silicon (fas
 
 ```bash
 git clone https://github.com/upsalesvideo/MoneyPrinterCannon && cd moneyprintercannon
-uv venv && uv pip install -e ".[mlx]"        # or: pip install -e ".[whisper]"
+uv venv && uv pip install -e ".[mlx,publish]" # or: pip install -e ".[whisper,publish]"
 (cd remotion && npm install)
 cp .env.example .env                          # put GENOSAI_API_KEY here
 source .venv/bin/activate
@@ -117,6 +118,33 @@ Works from n8n, Make, curl, your own backend — no auth by default, bind to loc
 Open **http://127.0.0.1:8787/** after `cannon serve`: a single-page dark UI with live credit
 estimate, task list, stage progress, log tail, inline player, copy buttons for title / caption /
 hashtags, presets export/import and "clone settings from a previous task".
+
+## Publishing (free, via Composio)
+
+MoneyPrinterTurbo posts through the paid upload-post.com. MoneyPrinterCannon posts through
+**[Composio](https://composio.dev)** — managed OAuth for YouTube, Instagram (Business/Creator),
+TikTok and LinkedIn, **free tier: 100 000 tool calls / month, unlimited connected accounts**.
+No OAuth apps to register, no app reviews, tokens are stored and refreshed for you.
+
+```bash
+# 1. free key → .env
+COMPOSIO_API_KEY=ak_...
+# 2. connect channels once (opens a link, waits for you to finish)
+cannon connect youtube
+cannon connect tiktok
+cannon connections
+# 3. publish
+cannon publish <task_id> --to youtube,tiktok --privacy public
+cannon make "Topic" --publish youtube --privacy unlisted     # generate and post in one go
+```
+
+REST: `GET /api/publish/status`, `POST /api/publish/connect {"platform": "youtube"}` → link,
+`POST /api/tasks/{id}/publish {"platforms": ["youtube"], "privacy": "public"}`. The Web UI has the
+same buttons on every finished task. Title / caption / hashtags come from the script's social copy
+(override with `--title`, `--caption`). Notes: Instagram needs a Business/Creator account linked to a
+Facebook Page; TikTok apps that have not passed TikTok's audit can only post `SELF_ONLY`
+(private) — flip the video to public in the TikTok app; `COMPOSIO_USER_ID` separates channel sets
+(one per client).
 
 ## For AI agents
 

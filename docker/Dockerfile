@@ -36,7 +36,7 @@ RUN cd remotion && (test -f package-lock.json && npm ci --no-audit --no-fund || 
 # Python deps + project.
 COPY pyproject.toml README.md* ./
 COPY moneyprintercannon ./moneyprintercannon
-RUN uv pip install --system --no-cache .
+RUN uv pip install --system --no-cache ".[whisper,publish]"
 
 # Rest of the project (webui, remotion sources, skill, examples).
 COPY . .

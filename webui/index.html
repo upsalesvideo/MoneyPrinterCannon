@@ -217,6 +217,17 @@ details.log pre{margin:0;padding:10px 12px;max-height:260px;overflow:auto;font:1
 .skel{height:14px;border-radius:6px;background:linear-gradient(90deg,#141c19,#1c2622,#141c19);background-size:200% 100%;animation:sh 1.2s infinite}
 @keyframes sh{to{background-position:-200% 0}}
 kbd{font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;color:var(--muted)}
+
+    .pubbox{margin-top:14px;padding:12px 14px;border:1px solid var(--line,#1f2a26);border-radius:12px;background:rgba(255,255,255,.02)}
+    .pubhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .pubgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 14px;margin-bottom:10px}
+    .pubrow{display:flex;align-items:center;gap:8px;font-size:13px}
+    .pubrow .pill{font-size:11px;padding:1px 8px;border-radius:999px;background:rgba(16,185,129,.15);color:#10b981}
+    .pubact{display:flex;gap:10px;align-items:center}
+    .pubact select{background:#0f1512;color:inherit;border:1px solid #243029;border-radius:8px;padding:6px 8px}
+    .pubhist{margin-top:10px;font-size:12px;display:grid;gap:4px}
+    .pubhist .bad{color:#f87171}.pubhist .ok{color:#a7f3d0}
+    .pubbox .muted{color:#8b9a93;font-size:12px}
 </style>
 </head>
 <body>
@@ -856,6 +867,50 @@ function renderDetail() {
     copy(txt || '', k);
   }));
   box.querySelectorAll('[data-variant]').forEach(b => b.addEventListener('click', () => { const n = +b.dataset.variant; const v = $('#player'); v.src = `/api/tasks/${id}/video${n > 1 ? '/' + n : ''}`; state.selectedLoadedVideo = n; v.play().catch(() => {}); }));
+  if (done) renderPublish(id, box);
+}
+
+// ---------- publishing (Composio) ----------
+const PUB_LABELS = { youtube: 'YouTube', instagram: 'Instagram', tiktok: 'TikTok', linkedin: 'LinkedIn' };
+async function renderPublish(id, box) {
+  let host = box.querySelector('.pubbox');
+  if (!host) { host = document.createElement('div'); host.className = 'pubbox'; const res = box.querySelector('.result'); (res ? res.parentNode : box).insertBefore(host, res ? res.nextSibling : null); }
+  host.innerHTML = '<div class="pubhead"><b>Publish</b><span class="muted">via Composio · free</span></div><div class="muted">loading…</div>';
+  let st, done;
+  try { [st, done] = await Promise.all([api('/api/publish/status'), api(`/api/tasks/${id}/publish`)]); }
+  catch (e) { host.innerHTML = `<div class="pubhead"><b>Publish</b></div><div class="muted">${esc(e.message || String(e))}</div>`; return; }
+  const results = (done && done.results) || [];
+  if (!st.configured) {
+    host.innerHTML = `<div class="pubhead"><b>Publish</b><span class="muted">via Composio · free</span></div>
+      <div class="muted">Set <code>COMPOSIO_API_KEY</code> in <code>.env</code> (free key at <a href="https://platform.composio.dev" target="_blank" rel="noopener">platform.composio.dev</a>) and restart <code>cannon serve</code> to post to YouTube / Instagram / TikTok / LinkedIn.</div>`;
+    return;
+  }
+  const rows = st.platforms.map(p => {
+    const on = st.connected[p];
+    return `<label class="pubrow"><input type="checkbox" data-pub="${p}" ${on ? '' : 'disabled'}> <span>${PUB_LABELS[p] || p}</span>
+      ${on ? '<span class="pill ok">connected</span>' : `<button class="btn sm" data-connect="${p}">Connect</button>`}</label>`;
+  }).join('');
+  const hist = results.length ? `<div class="pubhist">${results.slice(-6).reverse().map(r => `<div class="${r.ok ? 'ok' : 'bad'}">${r.ok ? '✓' : '✗'} ${esc(PUB_LABELS[r.platform] || r.platform)} · ${r.ok ? (r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>` : esc(r.id || 'ok')) : esc(r.error || 'failed')}</div>`).join('')}</div>` : '';
+  host.innerHTML = `<div class="pubhead"><b>Publish</b><span class="muted">via Composio · user ${esc(st.user_id)}</span></div>
+    <div class="pubgrid">${rows}</div>
+    <div class="pubact"><select id="pubPrivacy"><option value="private">private</option><option value="unlisted">unlisted (YouTube)</option><option value="public">public</option></select>
+      <button class="btn primary sm" id="pubGo">Publish selected</button></div>${hist}`;
+  host.querySelectorAll('[data-connect]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true;
+    try { const r = await api('/api/publish/connect', { method: 'POST', body: JSON.stringify({ platform: b.dataset.connect }) }); window.open(r.redirect_url, '_blank'); toast('Finish the login in the new tab, then click Refresh'); }
+    catch (e) { toast(e.message || String(e), 'bad'); b.disabled = false; }
+  }));
+  host.querySelector('#pubGo').addEventListener('click', async () => {
+    const plats = [...host.querySelectorAll('[data-pub]:checked')].map(i => i.dataset.pub);
+    if (!plats.length) { toast('Pick at least one connected platform'); return; }
+    const btn = host.querySelector('#pubGo'); btn.disabled = true; btn.textContent = 'Publishing…';
+    try {
+      const r = await api(`/api/tasks/${id}/publish`, { method: 'POST', body: JSON.stringify({ platforms: plats, privacy: host.querySelector('#pubPrivacy').value }) });
+      const bad = r.results.filter(x => !x.ok);
+      toast(bad.length ? `Published ${r.results.length - bad.length}/${r.results.length}` : 'Published ✓', bad.length ? 'bad' : 'ok');
+    } catch (e) { toast(e.message || String(e), 'bad'); }
+    renderPublish(id, box);
+  });
 }
 
 async function action(act, s) {

@@ -601,6 +601,65 @@ def delete_task(task_id: str, force: bool = Query(False, description="Cancel fir
 
 
 # ---------------------------------------------------------------------------
+# Publishing (Composio, free tier)
+# ---------------------------------------------------------------------------
+def _publisher():
+    try:
+        from moneyprintercannon import publish as pub
+    except Exception as e:  # noqa: BLE001
+        raise ApiError(503, "PUBLISH_UNAVAILABLE", f"publish module failed to import: {e}")
+    return pub
+
+
+@app.get("/api/publish/status", tags=["publish"])
+def publish_status() -> dict:
+    pub = _publisher()
+    return {"configured": pub.is_configured(), "user_id": pub.user_id(), "platforms": list(pub.PLATFORMS),
+            "connected": pub.connected_platforms() if pub.is_configured() else {p: False for p in pub.PLATFORMS},
+            "hint": None if pub.is_configured() else "Set COMPOSIO_API_KEY in .env (free key at https://platform.composio.dev)"}
+
+
+@app.post("/api/publish/connect", tags=["publish"])
+def publish_connect(body: dict) -> dict:
+    pub = _publisher()
+    platform = str((body or {}).get("platform", "")).lower()
+    if platform not in pub.PLATFORMS:
+        raise ApiError(400, "BAD_PLATFORM", f"platform must be one of {', '.join(pub.PLATFORMS)}")
+    if not pub.is_configured():
+        raise ApiError(503, "PUBLISH_NOT_CONFIGURED", "COMPOSIO_API_KEY is not set")
+    try:
+        url, _ = pub.connect_url(platform)
+    except Exception as e:  # noqa: BLE001
+        raise ApiError(502, "COMPOSIO_ERROR", str(e)[:500])
+    return {"platform": platform, "redirect_url": url}
+
+
+@app.post("/api/tasks/{task_id}/publish", tags=["publish"])
+def publish_task_route(task_id: str, body: dict) -> dict:
+    pub = _publisher()
+    d = _task_dir(task_id)
+    plats = body.get("platforms") or []
+    if isinstance(plats, str):
+        plats = [x.strip() for x in plats.split(",") if x.strip()]
+    if not plats:
+        raise ApiError(400, "NO_PLATFORMS", "platforms is required")
+    if not pub.is_configured():
+        raise ApiError(503, "PUBLISH_NOT_CONFIGURED", "COMPOSIO_API_KEY is not set")
+    try:
+        results = pub.publish_task(d, plats, privacy=str(body.get("privacy") or "private"), title=str(body.get("title") or ""),
+                                   caption=str(body.get("caption") or ""), hashtags=body.get("hashtags"), variant=int(body.get("variant") or 1))
+    except pub.PublishError as e:
+        raise ApiError(400, "PUBLISH_ERROR", str(e))
+    return {"task_id": task_id, "results": [r.__dict__ for r in results]}
+
+
+@app.get("/api/tasks/{task_id}/publish", tags=["publish"])
+def publish_results(task_id: str) -> dict:
+    pub = _publisher()
+    return {"task_id": task_id, "results": pub.load_results(_task_dir(task_id))}
+
+
+# ---------------------------------------------------------------------------
 # Web UI
 # ---------------------------------------------------------------------------
 @app.get("/", include_in_schema=False)

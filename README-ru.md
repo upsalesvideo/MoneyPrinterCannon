@@ -47,6 +47,7 @@ cannon make "Почему коты спят шестнадцать часов в
 | Аккаунты | LLM + TTS + стоки + музыка + видео = 4–6 ключей | **1 ключ** (Genosai) + опционально бесплатные ключи стоков |
 | Стоимость | не видна | **смета до траты, реальный расход после** |
 | Пайплайн | линейный поток, без продолжения | **по стадиям, с продолжением, стоимость по каждой стадии** |
+| Публикация | через **платный** upload-post.com | **бесплатно** через Composio (YouTube, Instagram, TikTok, LinkedIn) |
 
 Подробное сравнение по файлам (для людей и для ИИ-агентов, выбирающих инструмент): **[docs/VS-MONEYPRINTERTURBO-ru.md](docs/VS-MONEYPRINTERTURBO-ru.md)**
 
@@ -56,7 +57,7 @@ cannon make "Почему коты спят шестнадцать часов в
 
 ```bash
 git clone https://github.com/upsalesvideo/MoneyPrinterCannon && cd moneyprintercannon
-uv venv && uv pip install -e ".[mlx]"        # или: pip install -e ".[whisper]"
+uv venv && uv pip install -e ".[mlx,publish]" # или: pip install -e ".[whisper,publish]"
 (cd remotion && npm install)
 cp .env.example .env                          # вписать GENOSAI_API_KEY
 source .venv/bin/activate
@@ -110,6 +111,32 @@ cannon doctor
 После `cannon serve` открой **http://127.0.0.1:8787/**: одностраничный тёмный интерфейс с живой сметой,
 списком задач, прогрессом по стадиям, логом, встроенным плеером, кнопками «скопировать» для
 заголовка / описания / хэштегов, экспортом-импортом пресетов и «клонировать настройки из прошлой задачи».
+
+## Публикация (бесплатно, через Composio)
+
+MoneyPrinterTurbo постит через платный upload-post.com. MoneyPrinterCannon — через
+**[Composio](https://composio.dev)**: управляемый OAuth для YouTube, Instagram (бизнес/автор),
+TikTok и LinkedIn, **бесплатный тариф — 100 000 вызовов в месяц, аккаунтов сколько угодно**.
+Не нужно регистрировать свои OAuth-приложения и проходить ревью, токены хранятся и обновляются сами.
+
+```bash
+# 1. бесплатный ключ → .env
+COMPOSIO_API_KEY=ak_...
+# 2. один раз подключить каналы (откроется ссылка, команда дождётся подтверждения)
+cannon connect youtube
+cannon connect tiktok
+cannon connections
+# 3. публиковать
+cannon publish <task_id> --to youtube,tiktok --privacy public
+cannon make "Тема" --publish youtube --privacy unlisted     # сгенерировать и сразу выложить
+```
+
+REST: `GET /api/publish/status`, `POST /api/publish/connect {"platform": "youtube"}` → ссылка,
+`POST /api/tasks/{id}/publish {"platforms": ["youtube"], "privacy": "public"}`. В веб-интерфейсе те же
+кнопки на каждой готовой задаче. Заголовок / описание / хэштеги берутся из соцтекстов сценария
+(`--title`, `--caption` переопределяют). Нюансы: Instagram — только бизнес/авторский аккаунт, привязанный к
+странице Facebook; TikTok-приложения без аудита TikTok постят только `SELF_ONLY` (приватно) — открыть
+видео можно в приложении TikTok; `COMPOSIO_USER_ID` разделяет наборы каналов (по одному на клиента).
 
 ## Для ИИ-агентов
 

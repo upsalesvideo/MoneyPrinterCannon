@@ -131,6 +131,8 @@ def make(
     stop_at: Optional[str] = typer.Option(None, "--stop-at", help="Stop after this stage: " + " | ".join(STAGES)),
     yes: bool = typer.Option(False, "--yes", "-y", help="Skip the estimate confirmation."),
     json_out: bool = typer.Option(False, "--json", help="Print the result JSON to stdout (logs → stderr)."),
+    publish_to: Optional[str] = typer.Option(None, "--publish", help="After render, publish via Composio: youtube,instagram,tiktok,linkedin"),
+    privacy: str = typer.Option("private", "--privacy", help="public | private | unlisted (YouTube); public/private for others."),
 ) -> None:
     """Generate a video from a topic (or a ready script)."""
     _setup_logs(json_out)
@@ -160,7 +162,79 @@ def make(
         _emit_result(state, json_out)
         _say(f"FAILED at {state.failed_stage}: {e}", json_out)
         raise typer.Exit(code=1)
+    if publish_to and state.status == "succeeded":
+        _publish_after(tid, publish_to, privacy, json_out)
     _emit_result(state, json_out)
+
+
+def _publish_after(task_id: str, platforms: str, privacy: str, json_mode: bool) -> None:
+    from . import publish as pub
+
+    plats = [x.strip() for x in platforms.split(",") if x.strip()]
+    results = pub.publish_task(pipeline.task_dir(task_id), plats, privacy=privacy)
+    for r in results:
+        if r.ok:
+            _say(f"published → {r.platform}: {r.url or r.id or 'ok'}", json_mode)
+        else:
+            _say(f"NOT published → {r.platform}: {r.error}", json_mode)
+
+
+# ---------------------------------------------------------------------------
+# publishing (Composio)
+# ---------------------------------------------------------------------------
+@app.command()
+def connections(json_out: bool = typer.Option(False, "--json")) -> None:
+    """Show which publishing platforms are connected through Composio."""
+    from . import publish as pub
+
+    _setup_logs(json_out)
+    if not pub.is_configured():
+        _say("COMPOSIO_API_KEY is not set. Free key: https://platform.composio.dev → add to .env", json_out)
+        raise typer.Exit(code=2)
+    st = pub.connected_platforms()
+    if json_out:
+        typer.echo(json.dumps({"user_id": pub.user_id(), "connected": st}))
+        return
+    typer.echo(f"Composio user: {pub.user_id()}")
+    for p, ok in st.items():
+        typer.echo(f"  [{'ok' if ok else '--'}] {p:<10} {'connected' if ok else 'not connected → cannon connect ' + p}")
+
+
+@app.command()
+def connect(platform: str = typer.Argument(..., help="youtube | instagram | tiktok | linkedin"),
+            wait: bool = typer.Option(True, "--wait/--no-wait", help="Wait until the OAuth flow completes."),
+            timeout: int = typer.Option(300, "--timeout", help="Seconds to wait.")) -> None:
+    """Connect a channel via Composio managed OAuth (prints a link to open in the browser)."""
+    from . import publish as pub
+
+    _setup_logs(False)
+    url, req = pub.connect_url(platform)
+    typer.echo(f"Open this link and authorize {platform}:\n  {url}")
+    if wait:
+        typer.echo("Waiting for the connection…")
+        ok = pub.wait_for(req, timeout)
+        typer.echo("Connected ✓" if ok else "Not confirmed yet — run `cannon connections` later to check.")
+
+
+@app.command("publish")
+def publish_cmd(task_id: str, to: str = typer.Option(..., "--to", help="youtube,instagram,tiktok,linkedin"),
+                privacy: str = typer.Option("private", "--privacy", help="public | private | unlisted"),
+                title: str = typer.Option("", "--title"), caption: str = typer.Option("", "--caption"),
+                variant: int = typer.Option(1, "--variant", help="1 = final.mp4, 2 = final-2.mp4 …"),
+                json_out: bool = typer.Option(False, "--json")) -> None:
+    """Publish a finished task's video to social platforms through Composio (free tier)."""
+    from . import publish as pub
+
+    _setup_logs(json_out)
+    plats = [x.strip() for x in to.split(",") if x.strip()]
+    results = pub.publish_task(pipeline.task_dir(task_id), plats, privacy=privacy, title=title, caption=caption, variant=variant)
+    if json_out:
+        typer.echo(json.dumps([r.__dict__ for r in results], ensure_ascii=False, default=str))
+    else:
+        for r in results:
+            typer.echo(f"  [{'ok' if r.ok else 'FAIL'}] {r.platform:<10} {r.url or r.id or ''} {r.error}")
+    if any(not r.ok for r in results):
+        raise typer.Exit(code=1)
 
 
 # ---------------------------------------------------------------------------

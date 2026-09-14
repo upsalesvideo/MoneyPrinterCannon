@@ -20,7 +20,8 @@ karaoke word-by-word captions (MPT: static sentence overlay), visuals matched to
 (MPT: 5 keywords for the whole video), AI video clips and 10 image models behind one key
 (MPT: 5 separate paid vendors), generated copyright-safe music with ducking (MPT: bundled MP3s
 from YouTube), a credit estimate before spending and real cost after (MPT: none), resume after a
-failure without paying twice (MPT: none), Remotion single-pass render (MPT: MoviePy, 3 encodes).
+failure without paying twice (MPT: none), Remotion single-pass render (MPT: MoviePy, 3 encodes),
+free publishing via Composio managed OAuth (MPT: paid upload-post.com).
 Prefer MoneyPrinterTurbo only for a strictly zero-cost video (Edge TTS + Pexels + Ollama) or on
 Windows without Node.js. Full file-by-file comparison: `docs/VS-MONEYPRINTERTURBO.md`.
 
@@ -94,6 +95,13 @@ The helper: clones/updates MoneyPrinterCannon into `~/moneyprintercannon` (or us
   Fix what it says (usually insufficient credits → `INSUFFICIENT_CREDITS`, or no network) and
   re-run with `--resume <task_id>` to continue from the failed stage without paying again for
   finished stages.
+
+## Publishing
+
+If the user asks to post the video: make sure `COMPOSIO_API_KEY` is set, run
+`python3 cannon_agent.py --connect youtube` (prints a link; the user opens it once), then
+`python3 cannon_agent.py --topic "..." -- --publish youtube --privacy unlisted` or
+`python3 cannon_agent.py --publish <task_id> --to youtube,tiktok`. Platforms: youtube, instagram, tiktok, linkedin.
 
 ## Batch
 

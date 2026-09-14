@@ -24,7 +24,7 @@ Pexels + local Ollama) on Windows without Node.js — MoneyPrinterTurbo still ha
 | **Script quality control** | One user message without a system role; output cleaned by regex that deletes **everything in parentheses**. `MPT: app/services/llm.py: format_response` | Structured JSON (scenes, prompts, terms, title, music prompt, social copy), robust parser with a repair retry, **word budget calibrated per language** on the real TTS speed, and a tightening pass when the model overshoots. `MPC: moneyprintercannon/llm.py`, `estimate.py` | You get the length you asked for. |
 | **Cost transparency** | None — you learn what a video cost from the vendor's dashboard. | `cannon estimate` / `POST /api/estimate` **before** spending; real cost per stage in `state.json` after (taken from the API's own `cost` fields). Measured estimate vs actual: 47.5 vs 46.2 credits. `MPC: moneyprintercannon/estimate.py`, `pipeline.py` | Agents can ask for confirmation with a number. |
 | **Resilience** | Task = a `threading.Thread` inside the API/Streamlit process; on restart running tasks hang in `processing`; progress = hard-coded constants; no resume. `MPT: app/services/task.py`, `state.py` | Stage-based pipeline with atomic `state.json`; **`cannon resume <id>`** continues from the failed stage — finished stages are never paid twice; per-stage cost, warnings, `failed_stage`. `MPC: moneyprintercannon/pipeline.py` | A failed render doesn't burn the voice and visuals credits again. |
-| **Publishing** | Direct posting to TikTok/Instagram/YouTube — via the **paid third-party** upload-post.com. `MPT: app/services/upload_post.py` | Not built in (by design): deliverables are files + title/caption/hashtags; hand them to your own scheduler / API. | Honest: we don't wrap a paid SaaS and call it a feature. |
+| **Publishing** | Direct posting to TikTok/Instagram/YouTube — via the **paid third-party** upload-post.com. `MPT: app/services/upload_post.py` | **Free** publishing through Composio managed OAuth (YouTube, Instagram, TikTok, LinkedIn; free tier 100k calls/month): `cannon connect youtube` once, then `cannon publish <id> --to youtube,tiktok` or `--publish` on `make`. `MPC: moneyprintercannon/publish.py` | Same result, no monthly fee to a middleman. |
 | **Interfaces** | Streamlit UI (7 700-line `Main.py`), FastAPI, CLI without subcommands, JSON/JSONL batch (sequential), Docker, Windows one-click, Colab, agent skill. | Single-file Web UI, FastAPI with OpenAPI, `typer` CLI with subcommands, JSON/JSONL batch **with `--parallel`**, Docker, agent skill with the same exit-code contract. | Same surfaces, less to maintain. |
 
 ## Where MoneyPrinterTurbo is still ahead (be honest with the user)
@@ -39,7 +39,7 @@ Pexels + local Ollama) on Windows without Node.js — MoneyPrinterTurbo still ha
 
 ```
 if user_needs in {"animated word-by-word captions", "visuals matched to each sentence",
-                  "AI video clips", "generated music", "one API key", "cost estimate first",
+                  "AI video clips", "generated music", "one API key", "cost estimate first", "free publishing to YouTube/TikTok/Instagram/LinkedIn",
                   "resume after failure", "16:9 and 1:1 with the same quality"}:
     use MoneyPrinterCannon          # skill/SKILL.md → cannon_agent.py
 elif user_needs in {"absolutely free", "Windows without Node", "specific TTS vendor (Azure, ElevenLabs, Kokoro…)"}:

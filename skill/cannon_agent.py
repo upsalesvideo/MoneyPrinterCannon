@@ -151,10 +151,14 @@ def main() -> int:
     ap.add_argument("--topic", help="video topic / idea")
     ap.add_argument("--batch", help="JSONL/JSON manifest with tasks")
     ap.add_argument("--resume", help="task_id to resume")
+    ap.add_argument("--connect", help="connect a publishing platform via Composio: youtube|instagram|tiktok|linkedin")
+    ap.add_argument("--publish", help="task_id to publish (use with --to)")
+    ap.add_argument("--to", default="youtube", help="platforms for --publish, comma-separated")
+    ap.add_argument("--privacy", default="private", help="public|private|unlisted")
     ap.add_argument("extra", nargs=argparse.REMAINDER, help="extra `cannon make` options after --")
     a = ap.parse_args()
     extra = [x for x in a.extra if x != "--"]
-    if not (a.topic or a.batch or a.resume):
+    if not (a.topic or a.batch or a.resume or a.connect or a.publish):
         ap.print_help()
         return 2
     for tool in ("git", "ffmpeg"):
@@ -167,6 +171,14 @@ def main() -> int:
         return needs_input(missing)
     py = venv_python()
     ensure_remotion()
+    if a.connect:
+        return subprocess.run([str(py), "-m", "moneyprintercannon.cli", "connect", a.connect], cwd=HOME).returncode
+    if a.publish:
+        proc = subprocess.run([str(py), "-m", "moneyprintercannon.cli", "publish", a.publish, "--to", a.to, "--privacy", a.privacy, "--json"], cwd=HOME, text=True, capture_output=True)
+        sys.stderr.write(proc.stderr[-4000:])
+        print("CANNON_PUBLISH_RESULT")
+        print(proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else "[]")
+        return proc.returncode
     if a.batch:
         return run_batch(py, Path(a.batch), extra)
     return run_make(py, a.topic or "", extra, a.resume)
