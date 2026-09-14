@@ -8,7 +8,8 @@ from typing import Optional
 
 from .schema import Estimate, Script, VideoParams
 
-WORDS_PER_SEC = {"ru": 2.4, "en": 2.6}
+# measured on Gemini TTS, style Promo/Hype, pace Natural (ru: 100 words = 53 s)
+WORDS_PER_SEC = {"ru": 1.9, "uk": 1.9, "en": 2.3, "de": 2.0, "fr": 2.2, "es": 2.3, "it": 2.2, "pt": 2.2, "tr": 2.0, "zh": 2.4}
 CHARS_PER_WORD = 6.5
 SCENE_SECONDS = 6.0
 
@@ -51,7 +52,7 @@ VIDEO_PRICE_PER_SEC_DEFAULT = 20.0
 
 
 def words_per_sec(language: str) -> float:
-    return WORDS_PER_SEC.get((language or "").lower()[:2], 2.5)
+    return WORDS_PER_SEC.get((language or "").lower()[:2], 2.2)
 
 
 def tts_cost_for_text(text: str) -> float:

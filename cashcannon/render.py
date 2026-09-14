@@ -143,7 +143,7 @@ def render_video(task_dir: Path, props: dict, out_name: str = "silent.mp4", prop
     out = task_dir / "render" / out_name
     out.parent.mkdir(parents=True, exist_ok=True)
     cmd = ["npx", "remotion", "render", "src/index.ts", "Main", str(out), f"--props={props_path}",
-           "--codec=h264", "--crf=16", "--muted", "--log=error"]
+           "--codec=h264", "--crf=18", "--muted", "--log=error"]
     if settings.render_concurrency:
         cmd.append(f"--concurrency={settings.render_concurrency}")
     logger.info("remotion render → {} ({:.1f}s, {} scenes)", out.name, props["durationSec"], len(props["scenes"]))

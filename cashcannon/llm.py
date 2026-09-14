@@ -233,6 +233,25 @@ def _script_from_topic(params: VideoParams, client: GenosaiClient) -> tuple[Scri
     logger.info("LLM script: topic={!r} lang={} target={}s/{}w scenes={}", params.topic[:60], lang, params.target_seconds, target_words, n_scenes)
     obj, cost = _ask_json(client, params.text_model, SYSTEM_WRITER, user, temperature=0.8)
     script = _build_script(obj, params, lang, narrations=None)
+    words = len(script.full_text.split())
+    # LLMs overshoot the word budget by 30-40 % — one cheap tightening pass keeps the video on target.
+    if words > target_words * 1.15:
+        logger.info("script too long ({} words vs {} target) — asking the model to tighten it", words, target_words)
+        listing = "\n".join(f"{s.index}. {s.narration}" for s in script.scenes)
+        fix_user = (
+            f"Here is a script with {len(script.scenes)} scenes ({words} words). It must be at most {target_words} words in total "
+            f"(hard limit) — cut filler, keep the hook, the facts and the call to action, keep exactly {len(script.scenes)} scenes, "
+            f"same language ({lang}). Keep visual_prompt / search_terms / motion of each scene UNCHANGED. Return the same JSON structure."
+            f"\n\nCurrent narration:\n{listing}\n\nCurrent JSON:\n{json.dumps(obj, ensure_ascii=False)}"
+        )
+        try:
+            obj2, cost2 = _ask_json(client, params.text_model, SYSTEM_WRITER, fix_user, temperature=0.3)
+            cost += cost2
+            script2 = _build_script(obj2, params, lang, narrations=None)
+            if len(script2.full_text.split()) < words:
+                script = script2
+        except Exception as exc:  # noqa: BLE001 — keep the long version rather than fail the stage
+            logger.warning("tightening pass failed, keeping the original script: {}", exc)
     logger.info("script ok: {} scenes, {} words, cost {}", len(script.scenes), len(script.full_text.split()), cost)
     return script, cost
 

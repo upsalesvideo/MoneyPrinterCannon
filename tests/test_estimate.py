@@ -1,4 +1,5 @@
-from cashcannon.estimate import estimate, image_price, tts_cost_for_text, video_price
+import math
+from cashcannon.estimate import estimate, words_per_sec, image_price, tts_cost_for_text, video_price
 from cashcannon.schema import Script, VideoParams
 
 
@@ -32,7 +33,8 @@ def test_estimate_with_script_and_video():
     est = estimate(VideoParams(topic="t", visual_source="ai_video", video_model="grok-imagine-1.5", music="none"), s)
     assert est.breakdown["music"] == 0
     assert est.breakdown["tts"] == 15  # 3 scenes × min 5
-    assert est.breakdown["visuals"] == 3 * 4 * 5  # 3 clips × ceil(4.6 s) × 4 cr
+    secs = math.ceil(12 / words_per_sec("en"))  # scene length from the calibrated speech rate
+    assert est.breakdown["visuals"] == 3 * secs * 4  # 3 clips × ceil(scene s) × 4 cr/s
 
 
 def test_estimate_stock_and_custom_voice():
